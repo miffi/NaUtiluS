@@ -10,7 +10,7 @@ import (
 func (app *application) routes() http.Handler {
 	router := httprouter.New()
 
-	router.HandlerFunc(http.MethodGet, "/fullGraph", app.fullGraph)
+	router.HandlerFunc(http.MethodGet, "/v1/fullGraph.json", app.fullGraph)
 
 	return router
 }
