@@ -67,7 +67,7 @@ func getConfigs() (cfg config, err error) {
 
 	neo4jPassword := os.Getenv("NEO4JPASSWORD")
 	if neo4jPassword == "" {
-		return cfg, errors.New("getConfigs: neo4j password env var not found")
+		return cfg, errors.New("getConfigs: NEO4JPASSWORD environment variable not found")
 	}
 
 	return config{
