@@ -16,7 +16,8 @@ const APP_NAME = "nautilus-backend"
 type config struct {
 	port          int
 	neo4jPassword string
-	localCORS bool
+	localCORS     bool
+	localCORSPort int
 }
 
 // A store of the application wide state of the web server.
@@ -31,7 +32,7 @@ func main() {
 		log.Fatal(err)
 	}
 
-	logger := log.New(os.Stdout, "", log.Ldate | log.Ltime)
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
 
 	app := &application{
 		config,
@@ -41,10 +42,10 @@ func main() {
 	router := app.routes()
 
 	server := &http.Server{
-		Addr: fmt.Sprintf(":%d", config.port),
-		Handler: router,
-		IdleTimeout: time.Minute,
-		ReadTimeout: time.Second * 10,
+		Addr:         fmt.Sprintf(":%d", config.port),
+		Handler:      router,
+		IdleTimeout:  time.Minute,
+		ReadTimeout:  time.Second * 10,
 		WriteTimeout: time.Second * 10,
 	}
 
@@ -55,28 +56,24 @@ func main() {
 
 func getConfigs() (cfg config, err error) {
 	flag.BoolVar(&cfg.localCORS, "localCORS", false, "Enable localhost CORS (for debugging)")
-
+	flag.IntVar(&cfg.localCORSPort, "localCORSPort", 3000, "Port for the localhost CORS")
 	flag.Parse()
 
-	var port int
-
-	portEnv := os.Getenv("PORT")
-	if portEnv == "" {
-		port = 8080
+	if portEnv := os.Getenv("PORT"); portEnv == "" {
+		cfg.port = 8080
 	} else {
-		port, err = strconv.Atoi(portEnv)
-
+		cfg.port, err = strconv.Atoi(portEnv)
 		if err != nil {
-			return cfg, err
+			return
 		}
 	}
-	cfg.port = port
 
 	neo4jPassword := os.Getenv("NEO4JPASSWORD")
 	if neo4jPassword == "" {
-		return cfg, errors.New("getConfigs: NEO4JPASSWORD environment variable not found")
+		err = errors.New("getConfigs: NEO4JPASSWORD environment variable not found")
+		return
 	}
 	cfg.neo4jPassword = neo4jPassword
 
-	return cfg, nil
+	return
 }
