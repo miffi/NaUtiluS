@@ -1,0 +1,9 @@
+.loading-fetch,
+.loading-error {
+    padding-left: 105px;
+    text-align: left;
+}
+
+.force-graph-2D {
+    padding-left: 105px;
+}

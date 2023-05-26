@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-// import exampleData from '../../exampledata.json';
+import './graph.css';
 
 function Graph() {
-    const graphURI = "http://localhost:8080/v1/fullGraph.json";
+    const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/fullGraph.json"
 
     const [displayWidth, setDisplayWidth] = useState(window.innerWidth);
     const [displayHeight, setDisplayHeight] = useState(window.innerHeight);
@@ -35,20 +35,13 @@ function Graph() {
         .finally(() => {
             setLoading(false);
         })
-    }, []);
+    }, [graphURI]);
 
-    if (loading) return "Fetching Graph Data...";
-    if (error) return "Error!"
-
-    // async function fetchGraph(uri) {
-    //     const response = await fetch(uri);
-    //     const jsonData = await response.json();
-    //     return jsonData;
-    // }
-
-    // const resultGraph = await fetchGraph(graphURI);
+    if (loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
+    if (error) return <div className="loading-error">Error! Failed to fetch graph data from</div>;
 
     return <ForceGraph2D
+        className='force-graph-2D'
         graphData={data}
         width={displayWidth}
         height={displayHeight}
