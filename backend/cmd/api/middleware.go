@@ -6,7 +6,7 @@ import (
 )
 
 func (app *application) enableCORS(next http.Handler) http.Handler {
-	origin := "https://nautilus-delta.vercel.app/"
+	origin := "https://nautilus-delta.vercel.app"
 	if app.config.localCORS {
 		origin = fmt.Sprintf(`http://localhost:%d`, app.config.localCORSPort)
 	}
