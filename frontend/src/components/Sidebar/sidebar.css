@@ -33,37 +33,11 @@ a {
     margin-top: 20px;
 }
 
-.menu-content {
+.content-container {
     left: 100px;
-    height: 100%;
-    min-width: 0;
-    width: 0px;
-    padding: none;
-    border-style: solid;
-    border-width: 1px;
-    border-color: azure;
-    position: fixed;
-    background-color: #3a3a3a;
+    position: relative;
     z-index: 1;
-    /* transition: width 300ms; */
-    overflow-y: scroll;
-    margin: none;
 }
 
-.menu-content-text {
-    width: 100%;
-    color: #eee;
-    display: none;
-    position: absolute;
-    text-align: left;
-}
 
-.menu-content-text h1 {
-    margin-block-start: 0;
-    padding-top: 0.67em;
-}
 
-.menu-filter {
-    border-bottom: solid;
-    padding-bottom: 30px;
-}
