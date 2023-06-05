@@ -2,3 +2,5 @@ github.com/julienschmidt/httprouter v1.3.0 h1:U0609e9tgbseu3rBINet9P48AI/D3oJs4d
 github.com/julienschmidt/httprouter v1.3.0/go.mod h1:JR6WtHb+2LUe8TCKY3cZOxFyyO8IZAc4RVcycCCAKdM=
 github.com/neo4j/neo4j-go-driver/v5 v5.8.0 h1:I+jtnFbbN9FvRP5etOsrdJNNEThHUCe6pO0MFk1md04=
 github.com/neo4j/neo4j-go-driver/v5 v5.8.0/go.mod h1:Vff8OwT7QpLm7L2yYr85XNWe9Rbqlbeb9asNXJTHO4k=
+github.com/neo4j/neo4j-go-driver/v5 v5.9.0 h1:TYxT0RSiwnvVFia90V7TLnRXv8HkdQQ6rTUaPVoyZ+w=
+github.com/neo4j/neo4j-go-driver/v5 v5.9.0/go.mod h1:Vff8OwT7QpLm7L2yYr85XNWe9Rbqlbeb9asNXJTHO4k=
