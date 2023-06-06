@@ -1,0 +1,24 @@
+.menu-description {
+    bottom: -42%;
+    max-width: calc(100% - 100px);
+    width: 100%;
+    height: 40%;
+    padding: none;
+    position: fixed;
+    border-style: solid;
+    border-width: 1px;
+    border-color: azure;
+    background-color: #3a3a3a;
+    z-index: inherit;
+    transition: bottom 200ms linear;
+    overflow-y: scroll;
+    margin: none;
+    color: #eee;
+    display: block;
+    text-align: left;
+}
+
+.menu-description h1 {
+    margin-block-start: 0;
+    padding-top: 0.67em;
+}
