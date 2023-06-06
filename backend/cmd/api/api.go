@@ -1,6 +1,7 @@
-package main
+package api
 
 import (
+	"context"
 	"errors"
 	"flag"
 	"fmt"
@@ -9,6 +10,8 @@ import (
 	"os"
 	"strconv"
 	"time"
+
+	"github.com/miffi/nautilus/backend/cmd/db"
 )
 
 const APP_NAME = "nautilus-backend"
@@ -22,21 +25,33 @@ type config struct {
 
 // A store of the application wide state of the web server.
 type application struct {
-	config config
-	logger *log.Logger
+	config      config
+	logger      *log.Logger
+	dbinterface db.DbInterface
 }
 
 func main() {
+	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+
 	config, err := getConfigs()
 	if err != nil {
-		log.Fatal(err)
+		logger.Fatal(err)
 	}
 
-	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	dbURI := "neo4j+s://a7d269fe.databases.neo4j.io"
+	dbinterface, err := db.NewDbInterface(dbURI, "neo4j", config.neo4jPassword)
+	if err != nil {
+		logger.Fatal(err)
+	}
+
+	defer func() {
+		logger.Fatal(dbinterface.Close(context.TODO()))
+	}()
 
 	app := &application{
 		config,
 		logger,
+		dbinterface,
 	}
 
 	router := app.routes()
@@ -51,7 +66,9 @@ func main() {
 
 	logger.Printf("starting %s server on %s", APP_NAME, server.Addr)
 	err = server.ListenAndServe()
-	logger.Fatal(err)
+	if err != nil {
+		logger.Fatal(err)
+	}
 }
 
 func getConfigs() (cfg config, err error) {
