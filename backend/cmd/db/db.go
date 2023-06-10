@@ -8,7 +8,7 @@ import (
 	"github.com/miffi/nautilus/backend/cmd/types"
 )
 
-type DbInterface struct {
+type DbQuery struct {
 	driver neo4j.DriverWithContext
 }
 
@@ -23,18 +23,18 @@ type Graph struct {
 	links []types.Link
 }
 
-func NewDbInterface(uri, username, password string) (db DbInterface, err error) {
+func NewDbQuery(uri, username, password string) (db DbQuery, err error) {
 	auth := neo4j.BasicAuth(username, password, "")
 	db.driver, err = neo4j.NewDriverWithContext(uri, auth)
 
 	return
 }
 
-func (db *DbInterface) Close(ctx context.Context) error {
+func (db *DbQuery) Close(ctx context.Context) error {
 	return db.driver.Close(ctx)
 }
 
-func (db *DbInterface) QueryFullGraph(ctx context.Context) (map[string]any, error) {
+func (db *DbQuery) QueryFullGraph(ctx context.Context) (map[string]any, error) {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
