@@ -4,11 +4,16 @@ import (
 	"context"
 	"errors"
 
-	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/miffi/nautilus/backend/cmd/types"
+	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
-type DbQuery struct {
+type DbQuery interface {
+	QueryFullGraph(ctx context.Context) (map[string]any, error)
+	Close(ctx context.Context) error
+}
+
+type query struct {
 	driver neo4j.DriverWithContext
 }
 
@@ -23,18 +28,21 @@ type Graph struct {
 	links []types.Link
 }
 
-func NewDbQuery(uri, username, password string) (db DbQuery, err error) {
+func NewDbQuery(uri, username, password string) (DbQuery, error) {
 	auth := neo4j.BasicAuth(username, password, "")
+
+	var db query
+	var err error
 	db.driver, err = neo4j.NewDriverWithContext(uri, auth)
 
-	return
+	return &db, err
 }
 
-func (db *DbQuery) Close(ctx context.Context) error {
+func (db *query) Close(ctx context.Context) error {
 	return db.driver.Close(ctx)
 }
 
-func (db *DbQuery) QueryFullGraph(ctx context.Context) (map[string]any, error) {
+func (db *query) QueryFullGraph(ctx context.Context) (map[string]any, error) {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
