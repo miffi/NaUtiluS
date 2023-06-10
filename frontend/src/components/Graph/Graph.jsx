@@ -42,7 +42,6 @@ function Graph(props) {
     if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
     if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
 
-
     return <ForceGraph2D
         ref={fgRef}
         className='force-graph-2D'

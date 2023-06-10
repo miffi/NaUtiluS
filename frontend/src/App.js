@@ -11,6 +11,7 @@ function App() {
   const [toggleFilter, setToggleFilter] = useState(false);
   const [toggleDesc, setToggleDesc] = useState(false);
 
+  const [original, setOriginal] = useState(null);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -69,6 +70,7 @@ function App() {
         throw response;
     })
     .then(data => {
+        setOriginal(data)
         setData(data);
     })
     .catch(error => {
@@ -82,6 +84,7 @@ function App() {
 
   let props = {
     graphURI: graphURI,
+    originalData: original,
     graphData: data,
     error: error,
     loading: loading,

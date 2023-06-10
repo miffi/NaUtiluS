@@ -33,7 +33,7 @@ function Sidebar(props) {
                 }>Description</a>
             </div>
             <div className='content-container'>
-                <Filter props/>
+                <Filter {...props}/>
                 <Description />
             </div>
             

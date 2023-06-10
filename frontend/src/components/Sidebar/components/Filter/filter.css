@@ -24,8 +24,37 @@
     padding-top: 0.67em;
 }
 
-.semester {
+.semester-dropdown
+{
     width: 80%;
     height: 25px;
     border-radius: 10px;
 }
+
+.department-dropdown {
+    display: flex;
+    flex-direction: column;
+    background-color: #ffffff;
+    color: black;
+    font-size: 14px;
+    align-items: left;
+}
+
+.department-dropdown .department-item {
+    display: flex;
+    margin: 2px;
+}
+
+.department-dropdown .department-label {
+    padding-bottom: 1px;
+}
+
+.done-courses{
+    width: 78%;
+    height: 25px;
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar {
+    display: none;
+  }
