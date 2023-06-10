@@ -1,6 +1,11 @@
 package main
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
+
+	"github.com/miffi/nautilus/backend/cmd/db"
+)
 
 func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
 	data, err := app.dbinterface.QueryFullGraph(r.Context())
@@ -12,4 +17,14 @@ func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		app.serverError(w, err)
 	}
+}
+
+func (app *application) filterPost(w http.ResponseWriter, r *http.Request) {
+	var options db.FilterOptions
+	err := json.NewDecoder(r.Body).Decode(&options)
+	if err != nil {
+		app.clientError(w, http.StatusBadRequest)
+	}
+	// TODO Write actual filtering logic
+	app.writeJSON(w, http.StatusOK, nil, nil)
 }

@@ -5,10 +5,22 @@ import (
 	"errors"
 
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"github.com/miffi/nautilus/backend/cmd/types"
 )
 
 type DbInterface struct {
 	driver neo4j.DriverWithContext
+}
+
+type FilterOptions struct {
+	Departments []string `json:"departments,omitempty"`
+	Courses []string `json:"courses,omitempty"`
+	Semester string `json:"semester,omitempty"`
+}
+
+type Graph struct {
+	nodes []types.Node
+	links []types.Link
 }
 
 func NewDbInterface(uri, username, password string) (db DbInterface, err error) {
