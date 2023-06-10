@@ -2,38 +2,40 @@ package db
 
 import (
 	"context"
-	"errors"
+	"log"
 
 	"github.com/miffi/nautilus/backend/cmd/types"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
 type DbQuery interface {
-	QueryFullGraph(ctx context.Context) (map[string]any, error)
+	QueryFullGraph(ctx context.Context) (Graph, error)
 	Close(ctx context.Context) error
 }
 
 type query struct {
 	driver neo4j.DriverWithContext
+	logger *log.Logger
 }
 
 type FilterOptions struct {
 	Departments []string `json:"departments,omitempty"`
-	Courses []string `json:"courses,omitempty"`
-	Semester string `json:"semester,omitempty"`
+	Courses     []string `json:"courses,omitempty"`
+	Semester    string   `json:"semester,omitempty"`
 }
 
 type Graph struct {
-	nodes []types.Node
-	links []types.Link
+	Nodes []types.Node `json:"nodes"`
+	Links []types.Link `json:"links"`
 }
 
-func NewDbQuery(uri, username, password string) (DbQuery, error) {
+func NewDbQuery(uri, username, password string, logger *log.Logger) (DbQuery, error) {
 	auth := neo4j.BasicAuth(username, password, "")
 
 	var db query
 	var err error
 	db.driver, err = neo4j.NewDriverWithContext(uri, auth)
+	db.logger = logger
 
 	return &db, err
 }
@@ -42,11 +44,11 @@ func (db *query) Close(ctx context.Context) error {
 	return db.driver.Close(ctx)
 }
 
-func (db *query) QueryFullGraph(ctx context.Context) (map[string]any, error) {
+func (db *query) QueryFullGraph(ctx context.Context) (Graph, error) {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
-	enc, err := session.ExecuteRead(ctx, func(tx neo4j.ManagedTransaction) (ans any, err error) {
+	fullGraphTxFunc := func(tx neo4j.ManagedTransaction) (graph Graph, err error) {
 		readGraph := `
 			MATCH (n:Cluster|Course)<-[:REQUIRES]-(p:Course|Cluster)
 			OPTIONAL MATCH (nDepartment:Department)<-[:IN_DEPARTMENT]-(n)
@@ -57,32 +59,69 @@ func (db *query) QueryFullGraph(ctx context.Context) (map[string]any, error) {
 					collect({
 						id: n.name,
 						cluster: "Cluster" in labels(n),
-						department: nDepartment.name
+						department: coalesce(nDepartment.name, "")
 					}),
 					collect({
 						id: p.name,
 						cluster: "Cluster" in labels(p),
-						department: pDepartment.name
+						department: coalesce(pDepartment.name, "")
 					})
 				) AS nodes
 			RETURN nodes, links
 		`
+
 		result, err := tx.Run(ctx, readGraph, nil)
 		if err != nil {
-			return
+			return graph, err
 		}
 
-		if result.Next(ctx) {
-			ans = map[string]any{"nodes": result.Record().Values[0], "links": result.Record().Values[1]}
-			if result.Next(ctx) {
-				err = errors.New("QueryFullGraph: Got more than one result for query")
-				return
-			}
+		record, err := result.Single(ctx)
+		if err != nil {
+			return graph, err
 		}
 
-		err = result.Err()
+		data := record.AsMap()
+		nodes := makeNodes(data["nodes"])
+		links := makeLinks(data["links"])
+
+		graph.Nodes = nodes
+		graph.Links = links
+
 		return
-	})
+	}
 
-	return enc.(map[string]any), err
+	return neo4j.ExecuteRead(ctx, session, fullGraphTxFunc)
+}
+
+func makeNodes(data any) []types.Node {
+	nodeInfo := data.([]any)
+	nodes := make([]types.Node, len(nodeInfo))
+
+	for i, info := range nodeInfo {
+		coercedInfo := info.(map[string]any)
+		var node types.Node
+		node.Name = coercedInfo["id"].(string)
+		node.IsCluster = coercedInfo["cluster"].(bool)
+		node.Department = coercedInfo["department"].(string)
+
+		nodes[i] = node
+	}
+
+	return nodes
+}
+
+func makeLinks(data any) []types.Link {
+	linkInfo := data.([]any)
+	links := make([]types.Link, len(linkInfo))
+
+	for i, info := range linkInfo {
+		coercedInfo := info.(map[string]any)
+		var link types.Link
+		link.FromName = coercedInfo["source"].(string)
+		link.ToName = coercedInfo["target"].(string)
+
+		links[i] = link
+	}
+
+	return links
 }

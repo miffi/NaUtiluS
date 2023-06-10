@@ -39,7 +39,7 @@ func main() {
 	}
 
 	dbURI := "neo4j+s://a7d269fe.databases.neo4j.io"
-	dbquery, err := db.NewDbQuery(dbURI, "neo4j", config.neo4jPassword)
+	dbquery, err := db.NewDbQuery(dbURI, "neo4j", config.neo4jPassword, logger)
 	if err != nil {
 		logger.Fatal(err)
 	}
