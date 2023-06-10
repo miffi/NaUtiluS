@@ -7,11 +7,11 @@ import Graph from './components/Graph/Graph';
 
 function App() {
   const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/fullGraph.json"
+  const filterURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/filter.json"
 
   const [toggleFilter, setToggleFilter] = useState(false);
   const [toggleDesc, setToggleDesc] = useState(false);
 
-  const [original, setOriginal] = useState(null);
   const [data, setData] = useState(null);
   const [error, setError] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -70,7 +70,6 @@ function App() {
         throw response;
     })
     .then(data => {
-        setOriginal(data)
         setData(data);
     })
     .catch(error => {
@@ -84,7 +83,8 @@ function App() {
 
   let props = {
     graphURI: graphURI,
-    originalData: original,
+    filterURI: filterURI,
+
     graphData: data,
     error: error,
     loading: loading,

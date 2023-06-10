@@ -26,13 +26,19 @@ function Filter(props) {
         }
 
         async function sendData(data) {
-            await fetch('http://localhost:8080/v1/filter.json', {
+            await fetch(props.filterURI, {
                 method: 'POST',
-                headers: {
-                    "Content-Type": 'application/json'
-                },
                 body: data
-            });
+            })
+            .then(response => {
+                console.log(response.status);
+                if (!response.ok) {
+                    throw new Error("HTTP status " + response.status);
+                }
+                return response.json();
+            }
+
+            );
         }
 
         function handleCheckboxChange(index) {
