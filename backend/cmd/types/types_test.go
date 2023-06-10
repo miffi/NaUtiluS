@@ -12,12 +12,11 @@ func TestNodeMarshal(t *testing.T) {
 	}{
 		{
 			Node{
-				ElementId: "something",
 				IsCluster: false,
 				Name: "cs2030s",
 				Department: "computing",
 			},
-			`{"id":"something","name":"cs2030s","department":"computing","cluster":false}`,
+			`{"id":"cs2030s","department":"computing","cluster":false}`,
 		},
 	}
 

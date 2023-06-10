@@ -25,9 +25,9 @@ type config struct {
 
 // A store of the application wide state of the web server.
 type application struct {
-	config      config
-	logger      *log.Logger
-	dbinterface db.DbInterface
+	config  config
+	logger  *log.Logger
+	dbquery db.DbQuery
 }
 
 func main() {
@@ -39,19 +39,19 @@ func main() {
 	}
 
 	dbURI := "neo4j+s://a7d269fe.databases.neo4j.io"
-	dbinterface, err := db.NewDbInterface(dbURI, "neo4j", config.neo4jPassword)
+	dbquery, err := db.NewDbQuery(dbURI, "neo4j", config.neo4jPassword, logger)
 	if err != nil {
 		logger.Fatal(err)
 	}
 
 	defer func() {
-		logger.Fatal(dbinterface.Close(context.TODO()))
+		logger.Fatal(dbquery.Close(context.TODO()))
 	}()
 
 	app := &application{
 		config,
 		logger,
-		dbinterface,
+		dbquery,
 	}
 
 	router := app.routes()
