@@ -8,7 +8,7 @@ import (
 )
 
 func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
-	data, err := app.dbinterface.QueryFullGraph(r.Context())
+	data, err := app.dbquery.QueryFullGraph(r.Context())
 	if err != nil {
 		app.serverError(w, err)
 	}

@@ -6,13 +6,12 @@ type Course struct {
 }
 
 type Node struct {
-	ElementId  string `json:"id"`
-	Name       string `json:"name"`
+	Name       string `json:"id"`
 	Department string `json:"department"`
 	IsCluster  bool   `json:"cluster"`
 }
 
 type Link struct {
-	FromElementId string `json:"from"`
-	ToElementId   string `json:"to"`
+	SourceName string `json:"source"`
+	TargetName   string `json:"target"`
 }
