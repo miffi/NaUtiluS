@@ -12,6 +12,6 @@ type Node struct {
 }
 
 type Link struct {
-	FromName string `json:"from"`
-	ToName   string `json:"to"`
+	SourceName string `json:"source"`
+	TargetName   string `json:"target"`
 }

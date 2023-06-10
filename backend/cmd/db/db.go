@@ -117,8 +117,8 @@ func makeLinks(data any) []types.Link {
 	for i, info := range linkInfo {
 		coercedInfo := info.(map[string]any)
 		var link types.Link
-		link.FromName = coercedInfo["source"].(string)
-		link.ToName = coercedInfo["target"].(string)
+		link.SourceName = coercedInfo["source"].(string)
+		link.TargetName = coercedInfo["target"].(string)
 
 		links[i] = link
 	}
