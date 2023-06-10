@@ -5,13 +5,13 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
 
 	"github.com/miffi/nautilus/backend/cmd/db"
+	"github.com/rs/zerolog"
 )
 
 const APP_NAME = "nautilus-backend"
@@ -26,26 +26,29 @@ type config struct {
 // A store of the application wide state of the web server.
 type application struct {
 	config  config
-	logger  *log.Logger
+	logger  zerolog.Logger
 	dbquery db.DbQuery
 }
 
 func main() {
-	logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+	logger := zerolog.New(os.Stdout)
 
 	config, err := getConfigs()
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal().Err(err).Msg("")
 	}
 
 	dbURI := "neo4j+s://a7d269fe.databases.neo4j.io"
 	dbquery, err := db.NewDbQuery(dbURI, "neo4j", config.neo4jPassword, logger)
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal().Err(err).Msg("")
 	}
 
 	defer func() {
-		logger.Fatal(dbquery.Close(context.TODO()))
+		err = dbquery.Close(context.TODO())
+		if err != nil {
+			logger.Fatal().Err(err).Msg("")
+		}
 	}()
 
 	app := &application{
@@ -64,10 +67,10 @@ func main() {
 		WriteTimeout: time.Second * 10,
 	}
 
-	logger.Printf("starting %s server on %s", APP_NAME, server.Addr)
+	logger.Info().Msgf("starting %s server on %s", APP_NAME, server.Addr)
 	err = server.ListenAndServe()
 	if err != nil {
-		logger.Fatal(err)
+		logger.Fatal().Err(err).Msg("")
 	}
 }
 

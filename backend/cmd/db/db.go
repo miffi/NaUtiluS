@@ -2,10 +2,10 @@ package db
 
 import (
 	"context"
-	"log"
 
 	"github.com/miffi/nautilus/backend/cmd/types"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
+	"github.com/rs/zerolog"
 )
 
 type DbQuery interface {
@@ -15,7 +15,7 @@ type DbQuery interface {
 
 type query struct {
 	driver neo4j.DriverWithContext
-	logger *log.Logger
+	logger zerolog.Logger
 }
 
 type FilterOptions struct {
@@ -29,13 +29,15 @@ type Graph struct {
 	Links []types.Link `json:"links"`
 }
 
-func NewDbQuery(uri, username, password string, logger *log.Logger) (DbQuery, error) {
+func NewDbQuery(uri, username, password string, logger zerolog.Logger) (DbQuery, error) {
 	auth := neo4j.BasicAuth(username, password, "")
 
 	var db query
 	var err error
 	db.driver, err = neo4j.NewDriverWithContext(uri, auth)
-	db.logger = logger
+	db.logger = logger.With().Str("component", "DbQuery").Logger()
+
+	db.logger.Info().Msgf("Started DbQuery to address %s", uri)
 
 	return &db, err
 }
