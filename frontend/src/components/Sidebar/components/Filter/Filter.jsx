@@ -16,17 +16,17 @@ function Filter(props) {
         
             const filterObject = {
                 department: selectedDepartments,
-                doneCourses: doneCourses,
+                courses: doneCourses,
                 semester: semester
             }
             let filterQuery = JSON.stringify(filterObject);
 
             console.log(filterQuery);
-            // sendData(filterQuery);
+            sendData(filterQuery);
         }
 
         async function sendData(data) {
-            await fetch(' http://localhost:3001/filter-data/v1', {
+            await fetch('http://localhost:8080/v1/filter.json', {
                 method: 'POST',
                 headers: {
                     "Content-Type": 'application/json'
