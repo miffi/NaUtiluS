@@ -1,8 +1,8 @@
 .menu-description {
-    bottom: -42%;
+    bottom: -100%;
     max-width: calc(100% - 100px);
     width: 100%;
-    height: 40%;
+    height: 50%;
     padding-left: 10px;
     padding-right: 10px;
     position: fixed;
@@ -19,7 +19,15 @@
     text-align: left;
 }
 
-.menu-description h1 {
+.description-header {
     margin-block-start: 0;
     padding-top: 0.67em;
+}
+
+.description-content {
+    display: none;
+}
+
+.description-placeholder {
+    display: none;
 }

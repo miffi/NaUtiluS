@@ -28,7 +28,7 @@ function Sidebar(props) {
                 }>Filter</a>
                 <a href = "#description" className="description-button" onClick={
                     () => {
-                        props.toggleDesc ? props.closeDesc() : props.openDesc("Click on a module to view its description");
+                        props.toggleDesc ? props.closeDesc() : props.openDesc(false, "Click on a node to view course information");
                     }
                 }>Description</a>
             </div>
@@ -42,55 +42,3 @@ function Sidebar(props) {
 }
 
 export default Sidebar;
-
-    // const [toggleFilter, setToggleFilter] = useState(false);
-    // const [toggleDesc, setToggleDesc] = useState(false);
-    
-
-    // function closeFilter() {
-    //     maximizeFilter();
-    //     setToggleFilter(false);
-    //     document.getElementById('filter').style.left = '-40%';
-    //     // document.getElementById('menu_content').style.width = '0';
-    //     // document.getElementById('menu_content').style.minWidth = '0';
-    //     // document.getElementById('menu_content_text').style.display = 'none';
-    // }
-    // function openFilter() {
-    //     if (toggleDesc) {
-    //         minimizeFilter();
-    //     }
-    //     setToggleFilter(true);
-    //     document.getElementById('filter').style.left = '100px';
-    //     // document.getElementById('menu_content').style.width = '30%';
-    //     // document.getElementById('menu_content').style.minWidth = '270px';
-    //     // document.getElementById('menu_content_text').style.display = 'block';
-    // }
-
-    // function closeDesc() {
-    //     if (toggleFilter) {
-    //         maximizeFilter();
-    //     }
-    //     setToggleDesc(false);
-    //     document.getElementById('description').style.bottom = '-42%';
-    //     // document.getElementById('menu_content').style.width = '0';
-    //     // document.getElementById('menu_content').style.minWidth = '0';
-    //     // document.getElementById('menu_content_text').style.display = 'none';
-    // }
-    // function openDesc() {
-    //     if (toggleFilter) {
-    //         minimizeFilter();
-    //     }
-    //     setToggleDesc(true);
-    //     document.getElementById('description').style.bottom = '0';
-    //     // document.getElementById('menu_content').style.width = '30%';
-    //     // document.getElementById('menu_content').style.minWidth = '270px';
-    //     // document.getElementById('menu_content_text').style.display = 'block';
-    // }
-
-    // function minimizeFilter() {
-    //     document.getElementById('filter').style.height = '60%';
-    // }
-
-    // function maximizeFilter() {
-    //     document.getElementById('filter').style.height = '100%';
-    // }

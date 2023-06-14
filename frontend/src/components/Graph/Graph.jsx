@@ -3,14 +3,11 @@ import ForceGraph2D from 'react-force-graph-2d';
 import './graph.css';
 
 function Graph(props) {
-    // const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/fullGraph.json"
-
     const [displayWidth, setDisplayWidth] = useState(window.innerWidth);
     const [displayHeight, setDisplayHeight] = useState(window.innerHeight);
-
-    // const [data, setData] = useState(null);
-    // const [error, setError] = useState(null);
-    // const [loading, setLoading] = useState(true);
+    
+    const [modError, setModError] = useState(null);
+    const [modLoading, setModLoading] = useState(true);
 
     const fgRef = props.graphRef;
 
@@ -19,26 +16,30 @@ function Graph(props) {
     setDisplayHeight(window.innerHeight);
     });
 
-    // useEffect(() => {
-    //     fetch(props.graphURI)
-    //     .then(response => {
-    //         if (response.ok){
-    //             return response.json();
-    //         }
-    //         throw response;
-    //     })
-    //     .then(data => {
-    //         props.setData(data);
-    //     })
-    //     .catch(error => {
-    //         console.error("Error fetching graph data: ", error);
-    //         props.setError(error);
-    //     })
-    //     .finally(() => {
-    //         props.setLoading(false);
-    //     })
-    // }, []);
+    async function fetchCourseInfo(node) {
+        let modURI = "https://api.nusmods.com/v2/2022-2023/modules/"+node.id+".json";
 
+        await fetch(modURI)
+            .then(response => {
+                if (response.ok){
+                    return response.json();
+                }
+                throw response;
+            })
+            .then(data => {
+                props.openDesc(true, data)
+                console.log(data);
+            })
+            .catch(error => {
+                console.error("Error fetching course data: ", error);
+                setModError(error);
+            })
+            .finally(() => {
+                setModLoading(false);
+            });
+        
+    }
+    
     if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
     if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
 
@@ -107,11 +108,13 @@ function Graph(props) {
             }
         }
         onNodeClick={(node) => {
-            props.openDesc(node.id);
             fgRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 14, 400);
             props.setXCoor(props.toggleFilter ? node.x - 20 : node.x);
             props.setYCoor(node.y + 14);
             fgRef.current.zoom(7, 400);
+            node.cluster === false
+            ? fetchCourseInfo(node)
+            : props.openDesc(false, "Not a module");
         }}
         onBackgroundClick={(event) => {
             props.closeDesc();

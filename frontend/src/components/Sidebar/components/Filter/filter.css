@@ -1,5 +1,5 @@
 .menu-filter {
-    left: -40%;
+    left: -70%;
     height: 100%;
     min-width: 270px;
     width: 20%;
@@ -31,16 +31,20 @@
     border-radius: 10px;
 }
 
-.department-dropdown {
+.department-dropdown,
+.course-dropdown {
     display: flex;
     flex-direction: column;
     background-color: #ffffff;
     color: black;
     font-size: 14px;
     align-items: left;
+    max-height: 120px;
+    overflow-y: auto;
 }
 
-.department-dropdown .department-item {
+.department-dropdown .department-item,
+.course-dropdown .course-item {
     display: flex;
     margin: 2px;
 }

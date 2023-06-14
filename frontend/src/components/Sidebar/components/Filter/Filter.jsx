@@ -3,20 +3,29 @@ import './filter.css';
 
 function Filter(props) {
     function Form() {
-        const oldData = props.originalData;
+        const listOfFaculties = ["College of Design and Engineering", "College of Humanities and Sciences",
+                                 "Faculty of Arts and Social Sciences", "Faculty of Science",
+                                 "Residential College Programmes", "School of Business",
+                                 "School of Computing", "Yong Siew Toh Conservatory of Music"];
+        const listOfCourses = props.graphData
+                                ? props.graphData.nodes.filter(node => node.cluster === false).map(node => node.id)
+                                : [];
 
         function handleSubmit() {
             let departments = document.getElementsByClassName("department-item");
-            let doneCourses = document.getElementById("done_courses").value.split(/[\s,]+/);
+            let courses = document.getElementsByClassName("course-item");
             let semester = document.getElementById("semester_dropdown").value;
 
             let selectedDepartments = [...departments]
                                         .filter(option => option.ariaSelected === "true")
                                         .map(option => option.ariaLabel);
-        
+            let selectedCourses = [...courses]
+                                    .filter(option => option.ariaSelected === "true")
+                                    .map(option => option.ariaLabel);
+
             const filterObject = {
                 department: selectedDepartments,
-                courses: doneCourses,
+                courses: selectedCourses,
                 semester: semester
             }
             let filterQuery = JSON.stringify(filterObject);
@@ -41,53 +50,60 @@ function Filter(props) {
             );
         }
 
-        function handleCheckboxChange(index) {
-            const id = "department-" + index;
-            const option = document.getElementById(id);
-            if (option.ariaSelected == "false") option.ariaSelected = "true";
-            else option.ariaSelected = "false";
+        function handleDepartmentCheckboxChange(index) {
+            const optionId = "department-" + index;
+            const checkboxId = "department-checkbox-" + index;
+            const option = document.getElementById(optionId);
+            const checkbox = document.getElementById(checkboxId);
+            if (option.ariaSelected === "false") {
+                option.ariaSelected = "true";
+                checkbox.checked = true;
+            }
+            else {
+                option.ariaSelected = "false";
+                checkbox.checked = false;
+            }
+        }
+
+        function handleCourseCheckboxChange(index) {
+            const optionId = "course-" + index;
+            const checkboxId = "course-checkbox-" + index;
+            const option = document.getElementById(optionId);
+            const checkbox = document.getElementById(checkboxId);
+            if (option.ariaSelected === "false") {
+                option.ariaSelected = "true";
+                checkbox.checked = true;
+            }
+            else {
+                option.ariaSelected = "false";
+                checkbox.checked = false;
+            }
         }
     
         return (
             <div className="filter-form" id="filter_form">
                 <label htmlFor='department_dropdown' style={{paddingLeft: 2 + 'px'}}>Department</label><br />
                 <div role="listbox" tabIndex={0} id="department_dropdown" className="department-dropdown" aria-multiselectable="true">
-                    <div id="department-0" className="department-item" role="option" aria-selected="false" aria-label="CDE">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(0)}></input>
-                        <label className="department-label">College of Design and Engineering</label>
-                    </div>
-                    <div id="department-1" className="department-item" role="option" aria-selected="false" aria-label="CHS">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(1)}></input>
-                        <label className="department-label">College of Humanities and Sciences</label>
-                    </div>
-                    <div id="department-2" className="department-item" role="option" aria-selected="false" aria-label="FASS">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(2)}></input>
-                        <label className="department-label">Faculty of Arts and Social Sciences</label>
-                    </div>
-                    <div id="department-3" className="department-item" role="option" aria-selected="false" aria-label="FoS">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(3)}></input>
-                        <label className="department-label">Faculty of Science</label>
-                    </div>
-                    <div id="department-4" className="department-item" role="option" aria-selected="false" aria-label="RC">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(4)}></input>
-                        <label className="department-label">Residential College Programmes</label>
-                    </div>
-                    <div id="department-5" className="department-item" role="option" aria-selected="false" aria-label="Biz">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(5)}></input>
-                        <label className="department-label">School of Business</label>
-                    </div>
-                    <div id="department-6" className="department-item" role="option" aria-selected="false" aria-label="SoC">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(6)}></input>
-                        <label className="department-label">School of Computing</label>
-                    </div>
-                    <div id="department-7" className="department-item" role="option" aria-selected="false" aria-label="YSTCM">
-                        <input className="department-checkbox" tabIndex={-1} type='checkbox' onChange={() => handleCheckboxChange(7)}></input>
-                        <label className="department-label">Yong Siew Toh Conservatory of Music</label>
-                    </div>
+                    {listOfFaculties.map((element, index)=> (
+                        <div
+                         id={"department-" + index} className="department-item" role="option" aria-selected="false"
+                         aria-label={element} onClick={() => handleDepartmentCheckboxChange(index)}>
+                            <input id={"department-checkbox-" + index} className="department-checkbox" tabIndex={-1} type='checkbox'></input>
+                            <label className="department-label">{element}</label>
+                        </div>
+                    ))}
                 </div><br />
                 <label htmlFor="done_courses" style={{paddingLeft: 2 + 'px'}}>Courses Finished</label><br />
-                <input type='text' id="done_courses" className="done-courses" placeholder="CS1010S, MA1521, etc."></input><br />
-                <br />
+                <div role="listbox" tabIndex={0} id="course_dropdown" className="course-dropdown" aria-multiselectable="true">
+                    {listOfCourses.map((element, index)=> (
+                        <div
+                         id={"course-" + index} className="course-item" role="option" aria-selected="false"
+                         aria-label={element} onClick={() => handleCourseCheckboxChange(index)}>
+                            <input id={"course-checkbox-" + index} className="course-checkbox" tabIndex={-1} type='checkbox'></input>
+                            <label className="course-label">{element}</label>
+                        </div>
+                    ))}
+                </div><br />
                 <label htmlFor='semester_dropdown' style={{paddingLeft: 2 + 'px'}}>Semester</label><br />
                 <select name="semester" id="semester_dropdown" className="semester-dropdown">
                     <option value="none"></option>
@@ -96,7 +112,7 @@ function Filter(props) {
                     <option value="SpSem1">Special Semester 1</option>
                     <option value="SpSem2">Special Semester 2</option>
                 </select><br /><br />
-                <button value="Apply" onClick={handleSubmit}>Apply</button>
+                <button value="Apply" onClick={handleSubmit}>Apply</button><br /><br />
             </div>
         );
     }
