@@ -1,9 +1,10 @@
 .menu-filter {
-    left: calc(100px - 32%);
+    left: -40%;
     height: 100%;
     min-width: 270px;
-    width: 30%;
-    padding: none;
+    width: 20%;
+    padding-left: 10px;
+    padding-right: 10px;
     border-style: solid;
     border-width: 1px;
     border-color: azure;
@@ -21,4 +22,10 @@
 .menu-filter h1 {
     margin-block-start: 0;
     padding-top: 0.67em;
+}
+
+.semester {
+    width: 80%;
+    height: 25px;
+    border-radius: 10px;
 }

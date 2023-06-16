@@ -1,48 +1,52 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
 import './graph.css';
 
-function Graph() {
-    const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/fullGraph.json"
+function Graph(props) {
+    // const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/fullGraph.json"
 
     const [displayWidth, setDisplayWidth] = useState(window.innerWidth);
     const [displayHeight, setDisplayHeight] = useState(window.innerHeight);
 
-    const [data, setData] = useState(null);
-    const [error, setError] = useState(null);
-    const [loading, setLoading] = useState(true);
+    // const [data, setData] = useState(null);
+    // const [error, setError] = useState(null);
+    // const [loading, setLoading] = useState(true);
+
+    const fgRef = props.graphRef;
 
     window.addEventListener('resize', () => {
     setDisplayWidth(window.innerWidth);
     setDisplayHeight(window.innerHeight);
     });
 
-    useEffect(() => {
-        fetch(graphURI)
-        .then(response => {
-            if (response.ok){
-                return response.json();
-            }
-            throw response;
-        })
-        .then(data => {
-            setData(data);
-        })
-        .catch(error => {
-            console.error("Error fetching graph data: ", error);
-            setError(error);
-        })
-        .finally(() => {
-            setLoading(false);
-        })
-    }, [graphURI]);
+    // useEffect(() => {
+    //     fetch(props.graphURI)
+    //     .then(response => {
+    //         if (response.ok){
+    //             return response.json();
+    //         }
+    //         throw response;
+    //     })
+    //     .then(data => {
+    //         props.setData(data);
+    //     })
+    //     .catch(error => {
+    //         console.error("Error fetching graph data: ", error);
+    //         props.setError(error);
+    //     })
+    //     .finally(() => {
+    //         props.setLoading(false);
+    //     })
+    // }, []);
 
-    if (loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
-    if (error) return <div className="loading-error">Error! Failed to fetch graph data from</div>;
+    if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
+    if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
+
 
     return <ForceGraph2D
+        ref={fgRef}
         className='force-graph-2D'
-        graphData={data}
+        graphData={props.graphData}
         width={displayWidth}
         height={displayHeight}
         nodeAutoColorBy="group"
@@ -103,6 +107,20 @@ function Graph() {
             bckgDimensions && ctx.fillRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions);
             }
         }
+        onNodeClick={(node) => {
+            props.openDesc(node.id);
+            fgRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 14, 400);
+            props.setXCoor(props.toggleFilter ? node.x - 20 : node.x);
+            props.setYCoor(node.y + 14);
+            fgRef.current.zoom(7, 400);
+        }}
+        onBackgroundClick={(event) => {
+            props.closeDesc();
+            fgRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 400);
+            props.setXCoor(props.toggleFilter ? -20 : 0);
+            props.setYCoor(0);
+            fgRef.current.zoom(1, 400);
+        }}
     />
 }
 
