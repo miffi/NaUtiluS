@@ -30,14 +30,10 @@ type Graph struct {
 }
 
 func NewDbQuery(uri, username, password string, logger zerolog.Logger) (DbQuery, error) {
-	auth := neo4j.BasicAuth(username, password, "")
-
 	var db query
 	var err error
-	db.driver, err = neo4j.NewDriverWithContext(uri, auth)
+	db.driver, err = getNeo4jDriver(uri, username, password)
 	db.logger = logger.With().Str("component", "DbQuery").Logger()
-
-	db.logger.Info().Msgf("Started DbQuery to address %s", uri)
 
 	return &db, err
 }
