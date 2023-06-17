@@ -1,25 +1,41 @@
 .menu-description {
-    bottom: -42%;
-    max-width: calc(100% - 100px);
-    width: 100%;
-    height: 40%;
-    padding-left: 10px;
-    padding-right: 10px;
-    position: fixed;
-    border-style: solid;
-    border-width: 1px;
-    border-color: azure;
-    background-color: #3a3a3a;
-    z-index: inherit;
-    transition: bottom 200ms linear;
-    overflow-y: auto;
-    margin: none;
-    color: #eee;
-    display: block;
-    text-align: left;
+	bottom: -100%;
+	max-width: calc(100% - 100px);
+	width: 100%;
+	height: 50%;
+	padding-left: 10px;
+	padding-right: 10px;
+	position: fixed;
+	border-style: solid;
+	border-width: 1px;
+	border-color: azure;
+	background-color: #3a3a3a;
+	z-index: inherit;
+	transition: bottom 200ms linear;
+	overflow-y: auto;
+	margin: none;
+	color: #eee;
+	display: block;
+	text-align: left;
 }
 
-.menu-description h1 {
-    margin-block-start: 0;
-    padding-top: 0.67em;
+.description-header {
+	margin-block-start: 0;
+	padding-top: 0.67em;
+}
+
+.description-content {
+	display: none;
+}
+
+.description-placeholder {
+	display: none;
+}
+
+.course-info {
+	
+}
+
+.search-header {
+	margin-bottom: 0;
 }
