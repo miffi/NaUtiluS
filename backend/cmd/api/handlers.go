@@ -26,5 +26,8 @@ func (app *application) filterPost(w http.ResponseWriter, r *http.Request) {
 		app.clientError(w, http.StatusBadRequest)
 	}
 	// TODO Write actual filtering logic
-	app.writeJSON(w, http.StatusOK, nil, nil)
+	err = app.writeJSON(w, http.StatusOK, nil, nil)
+	if err != nil {
+		app.serverError(w, err)
+	}
 }
