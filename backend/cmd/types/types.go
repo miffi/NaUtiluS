@@ -32,3 +32,5 @@ type Link struct {
 	SourceName string `json:"source"`
 	TargetName string `json:"target"`
 }
+
+type PrereqTree struct{}

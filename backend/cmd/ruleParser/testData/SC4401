@@ -1,0 +1,23 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		COHORT_YEARS MUST_BE_IN E:2006
+		AND
+		UNITS (100)
+		AND
+		COURSES (14) SC%:D
+		AND
+		GPA (4.0)
+	)
+	OR
+	(
+		COHORT_YEARS MUST_BE_IN S:2007
+		AND
+		UNITS (110)
+		AND
+		COURSES (15) SC%:D
+		AND
+		GPA (3.5)
+	)
+)

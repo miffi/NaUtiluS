@@ -1,0 +1,1 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree THEN ( COURSES (1) GEM1902%:D , GEM1912%:D , UTC11%:D )

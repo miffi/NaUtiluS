@@ -1,0 +1,1 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree THEN ( UNITS (100) AND COURSES (11) NM%:D AND GPA (3.2) )

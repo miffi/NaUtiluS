@@ -1,0 +1,19 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		(
+			UNITS (80)
+			AND
+			2ND_MAJOR MUST_BE_IN (1) 0110GLHON
+		)
+		OR
+		COURSES (7) PS%:D
+	)
+	AND
+	(
+		GPA (3.20)
+		OR
+		SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+	)
+)

@@ -1,0 +1,7 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (2) SP2171:D,SP2173:D
+	OR
+	COURSES (1) SP2251:D
+)

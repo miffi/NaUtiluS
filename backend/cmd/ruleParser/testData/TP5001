@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Graduate Degree Coursework
+THEN
+(
+	2ND_MAJOR MUST_BE_IN (1) 0613TSMCWK
+)

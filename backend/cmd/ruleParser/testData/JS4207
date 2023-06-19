@@ -1,0 +1,21 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		SUBJECTS (1) 52:7,78:7
+		OR
+		COURSES (1) LAJ3201:D,LAJ3203:D
+	)
+	AND
+	(
+		UNITS (80)
+		AND
+		COURSES (7) JS%:D
+		AND
+		(
+			GPA (3.2)
+			OR
+			SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+		)
+	)
+)

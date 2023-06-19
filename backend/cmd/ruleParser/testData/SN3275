@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	SUBJECTS (1) 49:4,23:4,3:4,9:4,41141:6,41142:6
+)

@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Graduate Degree Coursework
+THEN
+(
+	COURSES (2) LL4203:D,LL5203:D,LL6203:D
+)

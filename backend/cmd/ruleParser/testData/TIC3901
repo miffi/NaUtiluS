@@ -1,0 +1,1 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree THEN ( UNITS (40) AND COURSES (10) TIC%:D , TBA%:D , TMA%:D )
