@@ -32,17 +32,17 @@ type nusModsQuery struct {
 	logger zerolog.Logger
 }
 
-var dateRegex = regexp.MustCompile(`\d\d\d\d-\d\d\d\d`)
+var dateRegex = regexp.MustCompile(`^\d{4}-\d{4}$`)
 
-func isYearRangeValid(yearRange string) bool {
-	return dateRegex.MatchString(yearRange)
+func isYearRangeInvalid(yearRange string) bool {
+	return !dateRegex.MatchString(yearRange)
 }
 
 func (query *nusModsQuery) GetCourseDetails(yearRange string, courseCode string) (details types.CourseDetails, err error) {
-	/* if isYearRangeValid(yearRange) {
+	if isYearRangeInvalid(yearRange) {
 		err = ErrInvalidYearRange
 		return
-	} */
+	}
 
 	uri := fmt.Sprintf(apiEndPoint+"/%s/modules/%s.json", yearRange, courseCode)
 	dataReader, err := getHttpResponseBody(uri)
@@ -55,9 +55,9 @@ func (query *nusModsQuery) GetCourseDetails(yearRange string, courseCode string)
 }
 
 func (query *nusModsQuery) GetCourseSummaries(yearRange string) (summaries []types.CourseSummary, err error) {
-	/* if isYearRangeValid(yearRange) {
+	if isYearRangeInvalid(yearRange) {
 		return nil, ErrInvalidYearRange
-	} */
+	}
 
 	uri := fmt.Sprintf(apiEndPoint+"/%s/moduleList.json", yearRange)
 	dataReader, err := getHttpResponseBody(uri)
