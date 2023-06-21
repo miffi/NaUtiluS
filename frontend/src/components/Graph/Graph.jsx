@@ -20,19 +20,22 @@ function Graph(props) {
 		ref={fgRef}
 		className='force-graph-2D'
 		graphData={props.graphData}
+		minZoom={2}
 		width={displayWidth}
 		height={displayHeight}
 		nodeAutoColorBy="department"
 		backgroundColor='#424242'
 		nodeVal={50}
 		linkDirectionalArrowLength={
-			link => /cluster$/.test(link.source) ? 0 : 5
+			link => {
+				return link.target.cluster === true ? 0 : 5
+			}
 		}
 		linkColor={
-			link => /cluster$/.test(link.source) ? "#80deea" : "#e0e0e0"
+			link => link.target.cluster === true ? "#80deea" : "#e0e0e0"
 		}
 		linkDirectionalArrowColor={
-			link => "#757575"
+			() => "#757575"
 		}
 		nodeRelSize={50}
 		nodeCanvasObject={
@@ -89,12 +92,12 @@ function Graph(props) {
 				? props.fetchCourseInfo(node)
 				: props.openDesc(false, "Not a course node");
 		}}
-		onBackgroundClick={(event) => {
+		onBackgroundClick={() => {
 			props.closeDesc();
-			fgRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 400);
-			props.setXCoor(props.toggleFilter ? -20 : 0);
-			props.setYCoor(0);
-			fgRef.current.zoom(1, 400);
+			// fgRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 400);
+			// props.setXCoor(props.toggleFilter ? -20 : 0);
+			// props.setYCoor(0);
+			fgRef.current.zoom(2, 400);
 		}}
 	/>
 }

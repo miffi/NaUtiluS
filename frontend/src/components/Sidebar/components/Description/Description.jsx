@@ -14,10 +14,6 @@ function CourseInfo() {
 						<div id='semester_label'>Semester</div>
 						<div id='semester_content'>1, 2</div>
 					</div><br />
-					<div id='course_prereq' className='course-prereq'>
-						<div id='prereq_label'>Prerequisites</div>
-						<div id='prereq_content'>1, 2</div>
-					</div><br />
 				</div>
 			</div>
 	);

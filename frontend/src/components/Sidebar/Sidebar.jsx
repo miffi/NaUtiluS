@@ -1,6 +1,5 @@
 import React from 'react';
 import './sidebar.css';
-import { RiCloseLine, RiMenu3Line } from 'react-icons/ri';
 
 import Filter from './components/Filter/Filter';
 import Description from './components/Description/Description';
@@ -10,16 +9,7 @@ function Sidebar(props) {
 		<>
 			<div className='menu-bar' id='menu_bar'>
 				<div className='menu-icon'>
-					{props.toggleFilter || props.toggleDesc
-						? <RiCloseLine color='#eee' size='27' onClick={() => {
-							props.closeFilter();
-							props.closeDesc();
-						}} />
-						: <RiMenu3Line color='#eee' size='27' onClick={() => {
-							props.openDesc();
-							props.openFilter();
-						}} />
-					}
+					<img src="logo.svg" alt="" />
 				</div>
 				<a href="#filter" className="filter-button" onClick={
 					() => {
