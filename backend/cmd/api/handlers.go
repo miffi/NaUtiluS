@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/miffi/nautilus/backend/cmd/db"
+	"github.com/miffi/nautilus/backend/cmd/api/types"
 )
 
 func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
@@ -20,7 +20,7 @@ func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) filterPost(w http.ResponseWriter, r *http.Request) {
-	var options db.FilterOptions
+	var options types.FilterOptions
 	err := json.NewDecoder(r.Body).Decode(&options)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
