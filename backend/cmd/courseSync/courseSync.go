@@ -4,19 +4,14 @@ import (
 	"context"
 	"errors"
 	"os"
-	"time"
 
 	"github.com/miffi/nautilus/backend/cmd/db"
+	"github.com/miffi/nautilus/backend/cmd/rule"
 	"github.com/rs/zerolog"
-	"golang.org/x/time/rate"
 )
 
 func main() {
 	logger := zerolog.New(os.Stdout)
-
-	query := NewNUSModsQuery(logger)
-
-	ratelimit := rate.NewLimiter(rate.Every(time.Second), 2)
 
 	neo4jPassword := os.Getenv("NEO4JPASSWORD")
 	if neo4jPassword == "" {
@@ -24,13 +19,42 @@ func main() {
 	}
 
 	dbURI := "neo4j+s://a7d269fe.databases.neo4j.io"
-	dbmodify, err := db.CreateDbModify(dbURI, "neo4j", neo4jPassword, logger)
+	db, err := db.NewDb(dbURI, "neo4j", neo4jPassword, logger)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("")
 	}
-	_ = dbmodify
 
-	summaries, err := query.GetCourseSummaries("2022-2023")
+	parser := rule.NewParser()
+	entries, err := os.ReadDir("/home/max/files")
+	if err != nil {
+		logger.Fatal().Err(err).Msg("")
+	}
+
+	for _, file := range entries {
+		courseCode := file.Name()
+		logger := logger.With().Str("CourseCode", courseCode).Logger()
+		fileName := "/home/max/files/" + courseCode
+
+		file, err := os.Open(fileName)
+		if err != nil {
+			logger.Fatal().Err(err).Msg("")
+		}
+
+		output, err := parser.Parse(fileName, file)
+		if err != nil {
+			logger.Error().Err(err).Msg("")
+			continue
+		}
+
+		err = (*output).UpdateDb(context.TODO(), db, courseCode)
+		if err != nil {
+			logger.Fatal().Err(err).Msg("")
+		}
+
+		logger.Info().Msg("")
+	}
+
+	/* summaries, err := query.GetCourseSummaries("2022-2023")
 	if err != nil {
 		logger.Fatal().Err(err).Msg("")
 	}
@@ -45,11 +69,11 @@ func main() {
 			logger.Fatal().Err(err).Msg("")
 		}
 
-		err = dbmodify.AddCourse(context.TODO(), details)
+		err = db.AddCourse(context.TODO(), details)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("")
 		}
 
 		logger.Info().Str("Course", details.CourseCode).Msg("")
-	}
+	} */
 }

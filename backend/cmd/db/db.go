@@ -3,19 +3,20 @@ package db
 import (
 	"context"
 
-	"github.com/miffi/nautilus/backend/cmd/types"
+	"github.com/miffi/nautilus/backend/cmd/api/types"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/rs/zerolog"
 )
 
 type DbQuery interface {
-	QueryFullGraph(ctx context.Context) (Graph, error)
+	QueryFullGraph(ctx context.Context) (types.Graph, error)
 	Close(ctx context.Context) error
 }
 
 type DbModify interface {
 	AddCourse(ctx context.Context, details types.CourseDetails) error
 	AddCluster(ctx context.Context, howMany int, courseNames []string) (string, error)
+	AddRequires(ctx context.Context, source, target, grade string) error
 	Close(ctx context.Context) error
 }
 
@@ -27,17 +28,6 @@ type Db interface {
 type database struct {
 	driver neo4j.DriverWithContext
 	logger zerolog.Logger
-}
-
-type FilterOptions struct {
-	Departments []string `json:"departments,omitempty"`
-	Courses     []string `json:"courses,omitempty"`
-	Semester    string   `json:"semester,omitempty"`
-}
-
-type Graph struct {
-	Nodes []types.Node `json:"nodes"`
-	Links []types.Link `json:"links"`
 }
 
 func NewDb(uri, username, password string, logger zerolog.Logger) (Db, error) {
@@ -123,11 +113,11 @@ func getNodesTxFunc(ctx context.Context) neo4j.ManagedTransactionWorkT[[]types.N
 	}
 }
 
-func (db *database) QueryFullGraph(ctx context.Context) (Graph, error) {
+func (db *database) QueryFullGraph(ctx context.Context) (types.Graph, error) {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
-	var graph Graph
+	var graph types.Graph
 
 	nodes, err := neo4j.ExecuteRead(ctx, session, getNodesTxFunc(ctx))
 	if err != nil {
@@ -139,7 +129,7 @@ func (db *database) QueryFullGraph(ctx context.Context) (Graph, error) {
 		return graph, err
 	}
 
-	graph = Graph{
+	graph = types.Graph{
 		Nodes: nodes,
 		Links: links,
 	}
@@ -150,7 +140,7 @@ func (db *database) QueryFullGraph(ctx context.Context) (Graph, error) {
 func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.ManagedTransactionWork {
 	return func(tx neo4j.ManagedTransaction) (any, error) {
 		const courseAddQuery = `
-			MERGE (course:Course {name: $name})
+			MERGE (course:Course:Main {name: $name})
 			MERGE (department:Department {name: $department})
 			MERGE (course)-[:IN_DEPARTMENT]->(department)
 			RETURN course.name
@@ -175,18 +165,20 @@ func (db *database) AddCourse(ctx context.Context, details types.CourseDetails) 
 	return err
 }
 
-func findClusterWithOnlyCoursesTxFunc(ctx context.Context, howMany int, courseNames []string) neo4j.ManagedTransactionWorkT[string] {
+func findClusterWithOnlyCoursesTxFunc(ctx context.Context, howMany int, regexes []string) neo4j.ManagedTransactionWorkT[string] {
 	const query = `
-		MATCH (c:Cluster { howMany: $howMany })-[:REQUIRES]->(n:Course)
-		WITH c, collect(n.name) as courseNames
-		WHERE ALL(name IN courseNames WHERE name in $courseNames)
+		MATCH (c:Cluster)-[:REQUIRES]->(n:Course)
+		WITH c, collect(n.name) as names
+		WHERE ALL(
+			name IN names
+			WHERE ANY(regex in $regexes WHERE name =~ regex))
 		RETURN c.name as uuid
 		LIMIT 1
 	`
 	return func(tx neo4j.ManagedTransaction) (string, error) {
 		result, err := tx.Run(ctx, query, map[string]any{
-			"howMany":     howMany,
-			"courseNames": courseNames,
+			"howMany": howMany,
+			"regexes": regexes,
 		})
 		if err != nil {
 			return "", err
@@ -204,18 +196,19 @@ func findClusterWithOnlyCoursesTxFunc(ctx context.Context, howMany int, courseNa
 	}
 }
 
-func addClusterTxFunc(ctx context.Context, howMany int, courseNames []string) neo4j.ManagedTransactionWorkT[string] {
+func addClusterTxFunc(ctx context.Context, howMany int, nodeNames []string) neo4j.ManagedTransactionWorkT[string] {
 	const query = `
-		CREATE (c:Cluster { howMany: $howMany, name: randomUUID() })
-		UNWIND $courseNames as courseName
-		MATCH (n:Course { name: courseName})
+		CREATE (c:Cluster:Main { howMany: $howMany, name: randomUUID() })
+		WITH c
+		UNWIND $names as name
+		MATCH (n:Main { name: name })
 		CREATE (c)-[:REQUIRES]->(n)
-		RETURN c.name
+		RETURN c.name, count(n)
 	`
 	return func(tx neo4j.ManagedTransaction) (string, error) {
 		result, err := tx.Run(ctx, query, map[string]any{
-			"howMany":     howMany,
-			"courseNames": courseNames,
+			"howMany": howMany,
+			"names":   nodeNames,
 		})
 		if err != nil {
 			return "", err
@@ -223,7 +216,10 @@ func addClusterTxFunc(ctx context.Context, howMany int, courseNames []string) ne
 
 		value, err := result.Single(ctx)
 		if err != nil {
-			return "", err
+			// One of the courses does not exist. Sadly this is defined
+			// behaviour. There are no checks done in the prerequisiteRule from
+			// NUSMods' end.
+			return "", nil
 		}
 
 		uuid := value.Values[0].(string)
@@ -248,4 +244,39 @@ func (db *database) AddCluster(ctx context.Context, howMany int, courseNames []s
 		return "", err
 	}
 	return uuid, nil
+}
+
+func addRequiresTxFunc(ctx context.Context, source, target, grade string) neo4j.ManagedTransactionWorkT[neo4j.ResultSummary] {
+	if source == target {
+		panic("addRequiresTxFunc: source name should not be equal to target name")
+	}
+
+	query := `
+		MATCH (source:Main WHERE source.name =~ $source), (target:Main WHERE target.name =~ $target)
+		MERGE (source)-[:REQUIRES {grade: $grade}]->(target)
+	    RETURN source.name
+	    LIMIT 1
+	`
+
+	return func(tx neo4j.ManagedTransaction) (neo4j.ResultSummary, error) {
+		result, err := tx.Run(ctx, query, map[string]any{
+			"source": source,
+			"target": target,
+			"grade":  grade,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		return result.Consume(ctx)
+	}
+}
+
+func (db *database) AddRequires(ctx context.Context, source, target, grade string) error {
+	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	summary, err := neo4j.ExecuteWrite(ctx, session, addRequiresTxFunc(ctx, source, target, grade))
+	db.logger.Trace().Interface("summary", summary).Msgf("")
+	return err
 }

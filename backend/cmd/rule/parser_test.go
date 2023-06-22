@@ -1,4 +1,4 @@
-package ruleparser
+package rule
 
 import (
 	"os"
@@ -48,36 +48,36 @@ func TestParsesCoursesCorrectly(t *testing.T) {
 				Num: ptr(2),
 				CourseData: []Course{
 					{
-						Code:  []string{"CS2030S"},
-						Grade: ptr("A"),
+						Code:  "CS2030S",
+						Grade: "A",
 					},
 					{
-						Code:  []string{"CS2040S"},
-						Grade: ptr("D"),
+						Code:  "CS2040S",
+						Grade: "D",
 					},
 					{
-						Code:  []string{"CS1010", "%"},
-						Grade: ptr("D"),
+						Code:  "CS1010.*",
+						Grade: "D",
 					},
 				},
 			},
 		},
 		"WithoutNum": {
-			input: "COURSES CS1101S:A-,CS3230:D,CS2103%:D",
+			input: "COURSES CS1101S:A-,CS3230:D,CS2103%",
 			want: Courses{
 				Num: nil,
 				CourseData: []Course{
 					{
-						Code:  []string{"CS1101S"},
-						Grade: ptr("A-"),
+						Code:  "CS1101S",
+						Grade: "A-",
 					},
 					{
-						Code:  []string{"CS3230"},
-						Grade: ptr("D"),
+						Code:  "CS3230",
+						Grade: "D",
 					},
 					{
-						Code:  []string{"CS2103", "%"},
-						Grade: ptr("D"),
+						Code:  "CS2103.*",
+						Grade: "",
 					},
 				},
 			},
@@ -104,8 +104,8 @@ func TestParsesAndCorrectly(t *testing.T) {
 		Num: ptr(1),
 		CourseData: []Course{
 			{
-				Code:  []string{"CS2030S"},
-				Grade: ptr("D"),
+				Code:  "CS2030S",
+				Grade: "D",
 			},
 		},
 	}
@@ -113,8 +113,8 @@ func TestParsesAndCorrectly(t *testing.T) {
 		Num: ptr(1),
 		CourseData: []Course{
 			{
-				Code:  []string{"CS2040S"},
-				Grade: ptr("D"),
+				Code:  "CS2040S",
+				Grade: "D",
 			},
 		},
 	}
@@ -122,8 +122,8 @@ func TestParsesAndCorrectly(t *testing.T) {
 		Num: ptr(1),
 		CourseData: []Course{
 			{
-				Code:  []string{"CS2103", "%"},
-				Grade: ptr("D"),
+				Code:  "CS2103.*",
+				Grade: "D",
 			},
 		},
 	}
@@ -169,7 +169,7 @@ func TestParsesAndCorrectly(t *testing.T) {
 		"InsideAnotherRule": {
 			input: "PROGRAM_TYPES IF_IN Something THEN ((COURSES (1) CS2030S:D) AND (COURSES (1) CS2040S:D))",
 			want: ProgramTypes{
-				If: []string{"Something"},
+				If: "Something",
 				Then: Paren{
 					Body: parenRule,
 				},
@@ -205,34 +205,34 @@ func TestParsesAndCorrectly(t *testing.T) {
 func TestParsesRealRules(t *testing.T) {
 	tests := map[string]Rule{
 		"CS2030S": ProgramTypes{
-			If: []string{"Undergraduate", "Degree"},
+			If: "UndergraduateDegree",
 			Then: Paren{
 				Body: Courses{
 					Num: ptr(1),
 					CourseData: []Course{
 						{
-							Code:  []string{"CS1010"},
-							Grade: ptr("D"),
+							Code:  "CS1010",
+							Grade: "D",
 						},
 						{
-							Code:  []string{"CS1010E"},
-							Grade: ptr("D"),
+							Code:  "CS1010E",
+							Grade: "D",
 						},
 						{
-							Code:  []string{"CS1010X"},
-							Grade: ptr("D"),
+							Code:  "CS1010X",
+							Grade: "D",
 						},
 						{
-							Code:  []string{"CS1101S"},
-							Grade: ptr("D"),
+							Code:  "CS1101S",
+							Grade: "D",
 						},
 						{
-							Code:  []string{"CS1010S"},
-							Grade: ptr("D"),
+							Code:  "CS1010S",
+							Grade: "D",
 						},
 						{
-							Code:  []string{"CS1010J"},
-							Grade: ptr("D"),
+							Code:  "CS1010J",
+							Grade: "D",
 						},
 					},
 				},

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"regexp"
 
-	"github.com/miffi/nautilus/backend/cmd/types"
+	"github.com/miffi/nautilus/backend/cmd/api/types"
 	"github.com/rs/zerolog"
 )
 

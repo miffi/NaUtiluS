@@ -1,10 +1,11 @@
 // nolint: govet
-package ruleparser
+package rule
 
 import (
+	"strings"
+
 	"github.com/alecthomas/participle/v2"
 	"github.com/alecthomas/participle/v2/lexer"
-	"github.com/miffi/nautilus/backend/cmd/types"
 )
 
 var ruleLexer = lexer.MustSimple([]lexer.SimpleRule{
@@ -33,10 +34,6 @@ func NewParser() *participle.Parser[Rule] {
 }
 
 type (
-	Rule interface {
-		GetPrereqTree()
-	}
-
 	OrPrecedence interface {
 		orPrecedence()
 	}
@@ -61,8 +58,8 @@ func (m *MustBeIn) Capture(values []string) error {
 
 type (
 	ProgramTypes struct {
-		If   []string `"PROGRAM_TYPES" "IF_IN" (@Ident | "(" @Ident ")")+ "THEN"`
-		Then Rule     `@@`
+		If   string `"PROGRAM_TYPES" "IF_IN" (@Ident | @"(" @Ident @")")+ "THEN"`
+		Then Rule   `@@`
 	}
 
 	Programs struct {
@@ -90,8 +87,8 @@ type (
 	CohortYears struct {
 		MustBeIn *MustBeIn `"COHORT_YEARS" (@Must?`
 		Years    []Year    `@@+`
-		If       *Year     `| "IF_IN" @@+ "THEN"`
-		Rule     Rule      `@@)`
+		If       []Year    `| "IF_IN" @@+ "THEN"`
+		Rule     *Rule     `@@)`
 	}
 
 	GPA struct {
@@ -117,8 +114,8 @@ type (
 
 type (
 	Course struct {
-		Code  []string `(@Ident | @"%")*`
-		Grade *string  `(":" @(("A" | "B" | "C" | "D" | "E" | "F") ("+" | "-")? | "CS" | "P" | "S" ))?`
+		Code  CourseCode `@((Ident | "%")*)`
+		Grade string     `(":" @(("A" | "B" | "C" | "D" | "E" | "F") ("+" | "-")? | "CS" | "P" | "S" ))?`
 	}
 
 	Year struct {
@@ -132,6 +129,21 @@ type (
 		Code string `":" (@Number | @"N" | @"E" | @"AO" | @"W" | @"Y" | @"A" | @"D")`
 	}
 )
+
+type CourseCode string
+
+func (courseCode *CourseCode) Capture(values []string) error {
+	var builder strings.Builder
+	for _, value := range values {
+		if value == "%" {
+			builder.WriteString(".*")
+		} else {
+			builder.WriteString(value)
+		}
+	}
+	*courseCode = CourseCode(builder.String())
+	return nil
+}
 
 func (x ProgramTypes) GetPrereqTree()  {}
 func (x Programs) GetPrereqTree()      {}
