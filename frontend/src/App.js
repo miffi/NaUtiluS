@@ -29,9 +29,6 @@ function App() {
 		maximizeFilter();
 		setToggleFilter(false);
 		document.getElementById('filter').style.left = '-70%';
-
-		graphRef.current.centerAt(xCoor + 20, yCoor, 200)
-		setXCoor(xCoor + 20);
 	}
 
 	// function to open Filter sidebar
@@ -41,9 +38,6 @@ function App() {
 		}
 		setToggleFilter(true);
 		document.getElementById('filter').style.left = '100px';
-
-		graphRef.current.centerAt(xCoor - 20, yCoor, 200)
-		setXCoor(xCoor - 20);
 	}
 
 	// function to close Description sidebar
@@ -74,7 +68,7 @@ function App() {
 			const description = content.description;
 			const semesters = content.semesterData
 				.map(sem => sem.semester === 1 || sem.semester === 2
-						? sem.semester
+						? "Semester " + sem.semester
 						: sem.semester === 3
 						? "Special Semester 1"
 						: sem.semester === 4
@@ -83,16 +77,12 @@ function App() {
 				.reduce(
 					(accumulator, currentValue) => accumulator + ", " + currentValue
 				)
-			const prerequisites = content.prerequisite === undefined
-				? "none"
-				: content.prerequisite;
 
 			document.getElementById('description_header').innerHTML = title;
 			document.getElementById('description_placeholder').style.display = "none";
 			document.getElementById('description_content').style.display = "block";
 			document.getElementById('course_info').innerHTML = description;
 			document.getElementById('semester_content').innerHTML = semesters;
-			document.getElementById('prereq_content').innerHTML = prerequisites;
 		}
 	}
 
@@ -139,14 +129,14 @@ function App() {
 				throw response;
 			})
 			.then(data => {
-				props.openDesc(true, data)
+				openDesc(true, data)
 			})
 			.catch(error => {
 				console.error("Error fetching course data: ", error);
 			})
 	}
 
-	// pass on variables to props for other components  
+// pass on variables to props for other components  
 	let props = {
 		oldData: oldData,
 		graphURI: graphURI,

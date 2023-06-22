@@ -1,15 +1,37 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './filter.css';
 
 function Filter(props) {
 	function Form() {
+		const [nodes, setNodes] = useState([])
+		const [error, setError] = useState(null)
+		const [loading, setLoading] = useState(null)
+		
+		useEffect(() => {
+			fetch("https://api.nusmods.com/v2/2022-2023/moduleList.json")
+				.then(response => {
+					if (response.ok) {
+						return response.json();
+					}
+					throw response;
+				})
+				.then(data => {
+					setNodes(data);
+				})
+				.catch(error => {
+					console.error("Error fetching graph data: ", error);
+					setError(error);
+				})
+				.finally(() => {
+					setLoading(false);
+				})
+		}, []);
+		
 		const listOfFaculties = ["College of Design and Engineering", "College of Humanities and Sciences",
 			"Faculty of Arts and Social Sciences", "Faculty of Science",
 			"Residential College Programmes", "School of Business",
 			"School of Computing", "Yong Siew Toh Conservatory of Music"];
-		const listOfCourses = props.graphData
-			? props.graphData.nodes.filter(node => node.cluster === false).map(node => node.id)
-			: [];
+		const listOfCourses = nodes.map(node => node.moduleCode)
 
 		function handleSubmit() {
 			let departments = document.getElementsByClassName("department-item");
@@ -86,7 +108,7 @@ function Filter(props) {
 				<div role="listbox" tabIndex={0} id="department_dropdown" className="department-dropdown" aria-multiselectable="true">
 					{listOfFaculties.map((element, index) => (
 						<div
-							id={"department-" + index} className="department-item" role="option" aria-selected="false"
+							key={"department-" + index} className="department-item" role="option" aria-selected="false"
 							aria-label={element} onClick={() => handleDepartmentCheckboxChange(index)}>
 							<input id={"department-checkbox-" + index} className="department-checkbox" tabIndex={-1} type='checkbox'></input>
 							<label className="department-label">{element}</label>
@@ -95,14 +117,20 @@ function Filter(props) {
 				</div><br />
 				<label htmlFor="done_courses" style={{ paddingLeft: 2 + 'px' }}>Courses Finished</label><br />
 				<div role="listbox" tabIndex={0} id="course_dropdown" className="course-dropdown" aria-multiselectable="true">
-					{listOfCourses.map((element, index) => (
+					{
+					error
+					? <div type='text'>Cannot fetch course data</div>
+					: loading
+					? <div type='text'>Fetching course data</div>
+					: listOfCourses.map((element, index) => (
 						<div
-							id={"course-" + index} className="course-item" role="option" aria-selected="false"
+							key={"course-" + index} className="course-item" role="option" aria-selected="false"
 							aria-label={element} onClick={() => handleCourseCheckboxChange(index)}>
 							<input id={"course-checkbox-" + index} className="course-checkbox" tabIndex={-1} type='checkbox'></input>
 							<label className="course-label">{element}</label>
 						</div>
-					))}
+						))
+					}
 				</div><br />
 				<label htmlFor='semester_dropdown' style={{ paddingLeft: 2 + 'px' }}>Semester</label><br />
 				<select name="semester" id="semester_dropdown" className="semester-dropdown">

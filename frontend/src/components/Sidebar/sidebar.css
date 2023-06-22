@@ -16,9 +16,7 @@ a {
 	align-items: center;
 }
 
-.menu-icon {
-	transform: scaleX(-1);
-}
+
 
 .filter-button,
 .description-button {
