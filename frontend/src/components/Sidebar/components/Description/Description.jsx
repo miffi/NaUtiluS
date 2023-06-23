@@ -22,7 +22,7 @@ function CourseInfo() {
 function Search(props) {
 	function handleSearchSubmit() {
 		const courseName = document.getElementById('searchbar').value
-		const node = props.graphData.nodes.filter(node => node.id === courseName)
+		const node = props.oldData.nodes.filter(node => node.id === courseName)
 		if (node[0] === undefined) {
 			props.openDesc(false, "Course not found!");
 		}

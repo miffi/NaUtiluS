@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide, forceLink, forceManyBody } from "https://cdn.skypack.dev/d3-force-3d";
+import { forceCollide, forceLink, forceManyBody } from 'd3-force-3d'
 
 import './graph.css';
 
@@ -50,7 +50,7 @@ function Graph(props) {
 		}, [hoverNode, clickNode])
 
 	useEffect(() => {
-		if (props.graphData) {
+		if (props.oldData) {
 			fgRef.current
 			.d3Force('collide', forceCollide(26).strength(0.5))
 			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -30 : -500))
@@ -59,12 +59,12 @@ function Graph(props) {
 	}, [props.graphData]);
 
 // handle graph loading and error
-	if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
-	if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
+	// if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
+	// if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
 	return <ForceGraph2D
 		ref={fgRef}
 		className='force-graph-2D'
-		graphData={props.graphData}
+		graphData={props.oldData}
 		width={displayWidth}
 		height={displayHeight}
 		minZoom={0.6}
