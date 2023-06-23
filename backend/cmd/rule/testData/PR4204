@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (1) PR3117:D,PR3301:D,PHS2117:D
+)

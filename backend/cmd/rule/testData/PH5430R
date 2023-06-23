@@ -1,0 +1,17 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	UNITS (80)
+	AND
+	COURSES (7) PH%:D
+	AND
+	(
+		COHORT_YEARS MUST_BE_IN S:2007
+		AND
+		(
+			GPA (3.5)
+			OR
+			SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+		)
+	)
+)

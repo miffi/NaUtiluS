@@ -1,0 +1,1 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree THEN UNITS (100) AND COURSES (11) GE1%:D , GE2%:D , GE3%:D , GE4%:D AND GPA (3.2)

@@ -1,0 +1,19 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	UNITS (110)
+	AND
+	COURSES (15) GE%:D
+	AND
+	GPA (3.5)
+	AND
+	(
+		COHORT_YEARS MUST_BE_IN S:2007 E:2008
+		OR
+		(
+			COHORT_YEARS MUST_BE_IN S:2009
+			AND
+			COURSES (1) GE3240:D
+		)
+	)
+)

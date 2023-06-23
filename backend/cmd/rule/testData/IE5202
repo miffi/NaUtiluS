@@ -1,0 +1,15 @@
+(
+	PROGRAM_TYPES IF_IN Graduate Degree Coursework
+	THEN
+	(
+		COURSES (1) IE5002:D,IE6002:D
+	)
+)
+OR
+(
+	PROGRAM_TYPES IF_IN Undergraduate Degree
+	THEN
+	PROGRAMS MUST_BE_IN (1) 0607ISEHON
+	AND
+	SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+)

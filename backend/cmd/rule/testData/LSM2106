@@ -1,0 +1,15 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		SUBJECTS (1) 11:E,0011:E
+		OR
+		COURSES (1) LSM1301:D
+	)
+	AND
+	(
+		SUBJECTS (1) 09:E,63:E,0009:E
+		OR
+		COURSES (1) CM1417:D,CM1417X:D
+	)
+)
