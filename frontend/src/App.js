@@ -9,6 +9,7 @@ function App() {
 	
 	// variables to store URI of important links
 	const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/fullGraph.json'
+	const filterURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/filter.json'
 
 	// variables to handle toggle of Filter and Description sidebars
 	const [toggleFilter, setToggleFilter] = useState(false)
@@ -119,8 +120,7 @@ function App() {
 
 // fetch course information from nusmods
 	async function fetchCourseInfo(node) {
-		let modURI = "https://api.nusmods.com/v2/2022-2023/modules/" + node.id + ".json";
-
+		let modURI = "https://api.nusmods.com/v2/2023-2024/modules/" + node.id + ".json";
 		await fetch(modURI)
 			.then(response => {
 				if (response.ok) {
@@ -140,6 +140,7 @@ function App() {
 	let props = {
 		oldData: oldData,
 		graphURI: graphURI,
+		filterURI: filterURI,
 
 		graphData: data,
 		error: error,

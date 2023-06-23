@@ -27,7 +27,6 @@ function Search(props) {
 			props.openDesc(false, "Course not found!");
 		}
 		else {
-			console.log(node)
 			const courseData = node[0]
 			props.graphRef.current.centerAt(props.toggleFilter ? courseData.x - 20 : courseData.x, courseData.y + 14, 400);
 			props.setXCoor(props.toggleFilter ? courseData.x - 20 : courseData.x);

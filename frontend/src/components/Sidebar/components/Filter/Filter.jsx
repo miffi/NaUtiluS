@@ -8,7 +8,7 @@ function Filter(props) {
 		const [loading, setLoading] = useState(null)
 		
 		useEffect(() => {
-			fetch("https://api.nusmods.com/v2/2022-2023/moduleList.json")
+			fetch("https://api.nusmods.com/v2/2023-2024/moduleList.json")
 				.then(response => {
 					if (response.ok) {
 						return response.json();
@@ -19,7 +19,7 @@ function Filter(props) {
 					setNodes(data);
 				})
 				.catch(error => {
-					console.error("Error fetching graph data: ", error);
+					console.error("Error fetching courses list data: ", error);
 					setError(error);
 				})
 				.finally(() => {
@@ -108,7 +108,7 @@ function Filter(props) {
 				<div role="listbox" tabIndex={0} id="department_dropdown" className="department-dropdown" aria-multiselectable="true">
 					{listOfFaculties.map((element, index) => (
 						<div
-							key={"department-" + index} className="department-item" role="option" aria-selected="false"
+							id={"department-" + index} key={"department-" + index} className="department-item" role="option" aria-selected="false"
 							aria-label={element} onClick={() => handleDepartmentCheckboxChange(index)}>
 							<input id={"department-checkbox-" + index} className="department-checkbox" tabIndex={-1} type='checkbox'></input>
 							<label className="department-label">{element}</label>
@@ -124,7 +124,7 @@ function Filter(props) {
 					? <div type='text'>Fetching course data</div>
 					: listOfCourses.map((element, index) => (
 						<div
-							key={"course-" + index} className="course-item" role="option" aria-selected="false"
+							id={"course-" + index} key={"course-" + index} className="course-item" role="option" aria-selected="false"
 							aria-label={element} onClick={() => handleCourseCheckboxChange(index)}>
 							<input id={"course-checkbox-" + index} className="course-checkbox" tabIndex={-1} type='checkbox'></input>
 							<label className="course-label">{element}</label>

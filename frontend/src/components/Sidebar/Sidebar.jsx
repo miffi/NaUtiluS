@@ -1,7 +1,7 @@
 import React from 'react';
 import './sidebar.css';
 
-import Filter from './components/Filter/Filter';
+// import Filter from './components/Filter/Filter';
 import Description from './components/Description/Description';
 
 function Sidebar(props) {
@@ -13,7 +13,8 @@ function Sidebar(props) {
 				</div>
 				<a href="#filter" className="filter-button" onClick={
 					() => {
-						props.toggleFilter ? props.closeFilter() : props.openFilter();
+						// props.toggleFilter ? props.closeFilter() : props.openFilter();
+						window.alert("Feature Coming Soon")
 					}
 				}>Filter</a>
 				<a href="#description" className="description-button" onClick={
@@ -23,7 +24,7 @@ function Sidebar(props) {
 				}>Description</a>
 			</div>
 			<div className='content-container'>
-				<Filter {...props} />
+				{/* <Filter {...props} /> */}
 				<Description {...props} />
 			</div>
 

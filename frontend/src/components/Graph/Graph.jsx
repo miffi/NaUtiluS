@@ -1,5 +1,7 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
+import { forceCollide, forceLink, forceManyBody } from "https://cdn.skypack.dev/d3-force-3d";
+
 import './graph.css';
 
 function Graph(props) {
@@ -17,47 +19,58 @@ function Graph(props) {
 		setDisplayHeight(window.innerHeight);
 	});
 
-const nodeStyle = useCallback(
-	(node, ctx, globalScale) => {
-		if (node.cluster === true) {
-			ctx.fillStyle = '#e0e0e0';
-			ctx.beginPath();
-			ctx.ellipse(node.x, node.y, 10 / globalScale, 10 / globalScale, 0, 0, 2 * Math.PI);
-			ctx.fill();
-			node.__radius = 10 / globalScale;
-			return;
+	const nodeStyle = useCallback(
+		(node, ctx, globalScale) => {
+			if (node.cluster === true) {
+				ctx.fillStyle = '#e0e0e0';
+				ctx.beginPath();
+				ctx.ellipse(node.x, node.y, 10 / globalScale, 10 / globalScale, 0, 0, 2 * Math.PI);
+				ctx.fill();
+				node.__radius = 10 / globalScale;
+				return;
+			}
+			const label = node.id;
+			const fontSize = 17 / globalScale;
+
+			ctx.font = `${fontSize}px Sans-Serif`;
+			const textWidth = ctx.measureText(label).width;
+			const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.4);
+
+			ctx.fillStyle = node === clickNode ? '#00ff00' : node === hoverNode ? '#ffff00' : node.color;
+			ctx.beginPath()
+			ctx.roundRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions, 5/globalScale);
+			ctx.fill()
+
+			ctx.textAlign = 'center';
+			ctx.textBaseline = 'middle';
+			ctx.fillStyle = '#424242';
+			ctx.fillText(label, node.x, node.y);
+
+			node.__bckgDimensions = bckgDimensions;
+		}, [hoverNode, clickNode])
+
+	useEffect(() => {
+		if (props.graphData) {
+			fgRef.current
+			.d3Force('collide', forceCollide(26).strength(0.5))
+			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -30 : -500))
+			.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 20 : link.source.cluster === true ? 150 : 100))
 		}
-		const label = node.id;
-		const fontSize = 17 / globalScale;
-
-		ctx.font = `${fontSize}px Sans-Serif`;
-		const textWidth = ctx.measureText(label).width;
-		const bckgDimensions = [textWidth, fontSize].map(n => n + fontSize * 0.4);
-
-		ctx.fillStyle = node === clickNode ? '#00ff00' : node === hoverNode ? '#ffff00' : node.color;
-		ctx.beginPath()
-		ctx.roundRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions, 5/globalScale);
-		ctx.fill()
-
-		ctx.textAlign = 'center';
-		ctx.textBaseline = 'middle';
-		ctx.fillStyle = '#424242';
-		ctx.fillText(label, node.x, node.y);
-
-		node.__bckgDimensions = bckgDimensions;
-	}, [hoverNode, clickNode])
+	}, [props.graphData]);
 
 // handle graph loading and error
 	if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
 	if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
-
 	return <ForceGraph2D
 		ref={fgRef}
 		className='force-graph-2D'
 		graphData={props.graphData}
-		minZoom={2}
 		width={displayWidth}
 		height={displayHeight}
+		minZoom={0.6}
+		maxZoom={10}
+		cooldownTicks={100}
+		onEngineStop={() => fgRef.current.zoom(1, 400)}
 		nodeAutoColorBy="department"
 		backgroundColor='#424242'
 		nodeVal={50}
@@ -110,7 +123,7 @@ const nodeStyle = useCallback(
 			// fgRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 400);
 			// props.setXCoor(props.toggleFilter ? -20 : 0);
 			// props.setYCoor(0);
-			fgRef.current.zoom(2, 400);
+			fgRef.current.zoom(1, 400);
 		}}
 	/>
 }
