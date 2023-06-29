@@ -2,6 +2,7 @@ package rule
 
 import (
 	"context"
+	"strings"
 
 	"github.com/miffi/nautilus/backend/cmd/db"
 )
@@ -19,7 +20,9 @@ func (Programs) UpdateDb(ctx context.Context, database db.Db, sourceName string)
 }
 
 func (courses Courses) UpdateDb(ctx context.Context, database db.Db, sourceName string) error {
-	if courses.Num != nil {
+	onlyCourse := len(courses.CourseData) == 1 &&
+		!strings.ContainsRune(string(courses.CourseData[0].Code), '*')
+	if courses.Num != nil && !onlyCourse {
 		var courseCodes []string = nil
 		for _, course := range courses.CourseData {
 			courseCodes = append(courseCodes, string(course.Code))

@@ -248,10 +248,18 @@ func (db *database) AddCluster(ctx context.Context, howMany int, courseNames []s
 
 func addRequiresTxFunc(ctx context.Context, source, target, grade string) neo4j.ManagedTransactionWorkT[neo4j.ResultSummary] {
 	if source == target {
-		panic("addRequiresTxFunc: source name should not be equal to target name")
+		// TODO Add logging of this error, and remove the dummy function.
+		// random function cause I don't have a logger set up in here
+		return func(tx neo4j.ManagedTransaction) (neo4j.ResultSummary, error) {
+			result, err := tx.Run(ctx, "MATCH (n) RETURN n LIMIT 1", nil)
+			if err != nil {
+				return nil, err
+			}
+			return result.Consume(ctx)
+		}
 	}
 
-	query := `
+	const query = `
 		MATCH (source:Main WHERE source.name =~ $source), (target:Main WHERE target.name =~ $target)
 		MERGE (source)-[:REQUIRES {grade: $grade}]->(target)
 	    RETURN source.name
