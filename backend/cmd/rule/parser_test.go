@@ -12,15 +12,16 @@ func ptr[T any](v T) *T {
 	return &v
 }
 
-/* func TestParsesAllData(t *testing.T) {
+func TestParsesAllData(t *testing.T) {
 	parser := NewParser()
 	entries, err := os.ReadDir("testData")
 	if err != nil {
 		t.Fatalf("Could not read directory %s", err)
 	}
 	for _, file := range entries {
+		fileName := "testData/" + file.Name()
 		t.Run(file.Name(), func(t *testing.T) {
-			fileName := "testData/" + file.Name()
+			t.Parallel()
 
 			file, err := os.Open(fileName)
 			if err != nil {
@@ -35,7 +36,7 @@ func ptr[T any](v T) *T {
 			_ = output
 		})
 	}
-} */
+}
 
 func TestParsesCoursesCorrectly(t *testing.T) {
 	tests := map[string]struct {
@@ -167,9 +168,9 @@ func TestParsesAndCorrectly(t *testing.T) {
 			},
 		},
 		"InsideAnotherRule": {
-			input: "PROGRAM_TYPES IF_IN Something THEN ((COURSES (1) CS2030S:D) AND (COURSES (1) CS2040S:D))",
+			input: "PROGRAM_TYPES IF_IN Something (Testing for Parsing) THEN ((COURSES (1) CS2030S:D) AND (COURSES (1) CS2040S:D))",
 			want: ProgramTypes{
-				If: "Something",
+				If: []IfIn{{Value: "Something (Testing for Parsing)"}},
 				Then: Paren{
 					Body: parenRule,
 				},
@@ -205,7 +206,7 @@ func TestParsesAndCorrectly(t *testing.T) {
 func TestParsesRealRules(t *testing.T) {
 	tests := map[string]Rule{
 		"CS2030S": ProgramTypes{
-			If: "UndergraduateDegree",
+			If: []IfIn{{Value: "Undergraduate Degree"}},
 			Then: Paren{
 				Body: Courses{
 					Num: ptr(1),
@@ -238,30 +239,21 @@ func TestParsesRealRules(t *testing.T) {
 				},
 			},
 		},
-		/* "BSN4711": ProgramTypes{
-			If: []string{"Undergraduate", "Degree"},
+		"BSN4711": ProgramTypes{
+			If: []IfIn{{Value: "Undergraduate Degree"}},
 			Then: Paren{
 				Body: And{
-					Head: Courses{
-						Num: ptr(1),
-						CourseData: []Course{
-							{
-								Name: "BSP1703",
-								Glob: true,
-							},
-							{
-								Name: "BSP1707",
-								Glob: true,
-							},
-						},
-					},
-					Tail: []andPrecendence{
+					Branches: []andPrecendence{
 						Courses{
 							Num: ptr(1),
 							CourseData: []Course{
 								{
-									Name: "BSP2701",
-									Glob: true,
+									Code:  "BSP1703.*",
+									Grade: "D",
+								},
+								{
+									Code:  "BSP1707.*",
+									Grade: "D",
 								},
 							},
 						},
@@ -269,9 +261,24 @@ func TestParsesRealRules(t *testing.T) {
 							Num: ptr(1),
 							CourseData: []Course{
 								{
-									Name: "BSP1702",
-									Glob: true,
+									Code:  "BSP2701.*",
+									Grade: "D",
 								},
+							},
+						},
+						Courses{
+							Num: ptr(1),
+							CourseData: []Course{
+								{
+									Code:  "BSP1702.*",
+									Grade: "D",
+								},
+							},
+						},
+						CohortYears{
+							MustBeIn: ptr(MustBeIn(true)),
+							Years: []Year{
+								{SemesterCode: "S", Year: 2017},
 							},
 						},
 						Paren{
@@ -280,12 +287,13 @@ func TestParsesRealRules(t *testing.T) {
 									Paren{
 										Body: Paren{
 											Body: And{
-												Head: Programs{
-													MustBeIn: ptr(MustBeIn(true)),
-													Num:      ptr(1),
-													Names:    []string{"0200ACCHON", "0200BBAHON"},
-												},
-												Tail: []andPrecendence{
+												Branches: []andPrecendence{
+													Programs{
+														Type:     "PROGRAMS",
+														MustBeIn: ptr(MustBeIn(true)),
+														Num:      ptr(1),
+														Names:    []string{"0200ACCHON", "0200BBAHON"},
+													},
 													Special{
 														MustBeIn: ptr(MustBeIn(true)),
 														String:   "ACAD_LEVEL=4",
@@ -296,22 +304,23 @@ func TestParsesRealRules(t *testing.T) {
 									},
 									Paren{
 										Body: And{
-											Head: Paren{
-												Body: And{
-													Head: Programs{
-														MustBeIn: ptr(MustBeIn(true)),
-														Num:      ptr(1),
-														Names:    []string{"0200ACCHON", "0200BBAHON"},
-													},
-													Tail: []andPrecendence{
-														Special{
-															MustBeIn: ptr(MustBeIn(true)),
-															String:   "ACAD_LEVEL=3",
+											Branches: []andPrecendence{
+												Paren{
+													Body: And{
+														Branches: []andPrecendence{
+															Programs{
+																Type:     "PROGRAMS",
+																MustBeIn: ptr(MustBeIn(true)),
+																Num:      ptr(1),
+																Names:    []string{"0200ACCHON", "0200BBAHON"},
+															},
+															Special{
+																MustBeIn: ptr(MustBeIn(true)),
+																String:   "ACAD_LEVEL=3",
+															},
 														},
 													},
 												},
-											},
-											Tail: []andPrecendence{
 												GPA{
 													Score: 3.2,
 												},
@@ -324,7 +333,7 @@ func TestParsesRealRules(t *testing.T) {
 					},
 				},
 			},
-		}, */
+		},
 	}
 
 	parser := NewParser()

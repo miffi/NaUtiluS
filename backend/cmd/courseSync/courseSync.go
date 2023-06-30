@@ -24,8 +24,10 @@ func main() {
 		logger.Fatal().Err(err).Msg("")
 	}
 
+	directory := "/home/max/dev/nautilus/backend/cmd/rule/testData/"
+
 	parser := rule.NewParser()
-	entries, err := os.ReadDir("/home/max/files")
+	entries, err := os.ReadDir(directory)
 	if err != nil {
 		logger.Fatal().Err(err).Msg("")
 	}
@@ -33,7 +35,7 @@ func main() {
 	for _, file := range entries {
 		courseCode := file.Name()
 		logger := logger.With().Str("CourseCode", courseCode).Logger()
-		fileName := "/home/max/files/" + courseCode
+		fileName := directory + courseCode
 
 		file, err := os.Open(fileName)
 		if err != nil {

@@ -2,11 +2,14 @@ package rule
 
 import (
 	"context"
+	"strings"
 
 	"github.com/miffi/nautilus/backend/cmd/db"
 )
 
 type Rule interface {
+	traverse
+
 	UpdateDb(ctx context.Context, database db.Db, sourceName string) error
 }
 
@@ -19,7 +22,9 @@ func (Programs) UpdateDb(ctx context.Context, database db.Db, sourceName string)
 }
 
 func (courses Courses) UpdateDb(ctx context.Context, database db.Db, sourceName string) error {
-	if courses.Num != nil {
+	onlyCourse := len(courses.CourseData) == 1 &&
+		!strings.ContainsRune(string(courses.CourseData[0].Code), '*')
+	if courses.Num != nil && !onlyCourse {
 		var courseCodes []string = nil
 		for _, course := range courses.CourseData {
 			courseCodes = append(courseCodes, string(course.Code))
@@ -78,13 +83,31 @@ func (and And) UpdateDb(ctx context.Context, database db.Db, sourceName string) 
 }
 
 func (or Or) UpdateDb(ctx context.Context, database db.Db, sourceName string) error {
-	panic("unimplemented")
-	for _, branch := range or.Branches {
-		err := branch.(Rule).UpdateDb(ctx, database, sourceName)
+	num := or.courseBranches()
+	if num == 0 {
+		return nil
+	}
+
+	nodeName := sourceName
+	if num > 1 {
+		var err error
+		nodeName, err = database.MakeOr(ctx)
+		if err != nil {
+			return err
+		}
+		err = database.AddRequires(ctx, sourceName, nodeName, "")
 		if err != nil {
 			return err
 		}
 	}
+
+	for _, branch := range or.Branches {
+		err := branch.(Rule).UpdateDb(ctx, database, nodeName)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

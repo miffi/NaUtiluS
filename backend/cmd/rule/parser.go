@@ -9,7 +9,7 @@ import (
 )
 
 var ruleLexer = lexer.MustSimple([]lexer.SimpleRule{
-	{Name: "Program", Pattern: `(?i)\b((SPECIAL_)?PROGRAM(ME)?S?|2ND_MAJOR|MINOR)\b`},
+	{Name: "Program", Pattern: `(?i)\b((SPECIAL_)?PROGRAM(ME)?S?|SPECIALISATION|2ND_MAJOR|MINOR)\b`},
 	{Name: "Keyword", Pattern: `(?i)\b(SUBJECTS|UNITS|PROGRAM_TYPES|GPA|UNITS|COHORT_YEARS|SPECIAL|AND|OR|IF_IN|THEN|COURSES)\b`},
 	{Name: "Must", Pattern: `(?i)\b(MUST_BE_IN|MUST_NOT_BE_IN)\b`},
 	{Name: "ProgramName", Pattern: `\b(\d{4}[a-zA-Z_]\w*|CY)\b`},
@@ -58,7 +58,7 @@ func (m *MustBeIn) Capture(values []string) error {
 
 type (
 	ProgramTypes struct {
-		If   string `"PROGRAM_TYPES" "IF_IN" (@Ident | @"(" @Ident @")")+ "THEN"`
+		If   []IfIn `"PROGRAM_TYPES" @@ ("OR" "PROGRAM_TYPES" @@)* "THEN"`
 		Then Rule   `@@`
 	}
 
@@ -85,10 +85,10 @@ type (
 	}
 
 	CohortYears struct {
-		MustBeIn *MustBeIn `"COHORT_YEARS" (@Must?`
-		Years    []Year    `@@+`
-		If       []Year    `| "IF_IN" @@+ "THEN"`
-		Rule     *Rule     `@@)`
+		MustBeIn  *MustBeIn `"COHORT_YEARS" (@Must?`
+		Years     []Year    `@@+`
+		IfInYears []Year    `| "IF_IN" @@+ "THEN"`
+		Rule      *Rule     `@@)`
 	}
 
 	GPA struct {
@@ -126,9 +126,30 @@ type (
 
 	Subject struct {
 		Num  string `(@Number | @Ident)`
-		Code string `":" (@Number | @"N" | @"E" | @"AO" | @"W" | @"Y" | @"A" | @"D")`
+		Code string `":" @(Number | "N" | "E" | "AO" | "W" | "Y" | "A" | "D" | "X")`
 	}
 )
+
+type IfIn struct {
+	Value ProgramTypeName `"IF_IN" @((Ident | "(" Ident+ ")" )+)`
+}
+
+type ProgramTypeName string
+
+func (programTypeName *ProgramTypeName) Capture(values []string) error {
+	var sb strings.Builder
+	sb.WriteString(values[0])
+	lastWasLeftParen := values[0] == "("
+	for _, value := range values[1:] {
+		if !lastWasLeftParen && value != ")" {
+			sb.WriteRune(' ')
+		}
+		sb.WriteString(value)
+		lastWasLeftParen = value == "("
+	}
+	*programTypeName = ProgramTypeName(sb.String())
+	return nil
+}
 
 type CourseCode string
 
