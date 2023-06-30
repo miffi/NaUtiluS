@@ -8,6 +8,8 @@ import (
 )
 
 type Rule interface {
+	traverse
+
 	UpdateDb(ctx context.Context, database db.Db, sourceName string) error
 }
 
@@ -81,13 +83,31 @@ func (and And) UpdateDb(ctx context.Context, database db.Db, sourceName string) 
 }
 
 func (or Or) UpdateDb(ctx context.Context, database db.Db, sourceName string) error {
-	panic("unimplemented")
-	for _, branch := range or.Branches {
-		err := branch.(Rule).UpdateDb(ctx, database, sourceName)
+	num := or.courseBranches()
+	if num == 0 {
+		return nil
+	}
+
+	nodeName := sourceName
+	if num > 1 {
+		var err error
+		nodeName, err = database.MakeOr(ctx)
+		if err != nil {
+			return err
+		}
+		err = database.AddRequires(ctx, sourceName, nodeName, "")
 		if err != nil {
 			return err
 		}
 	}
+
+	for _, branch := range or.Branches {
+		err := branch.(Rule).UpdateDb(ctx, database, nodeName)
+		if err != nil {
+			return err
+		}
+	}
+
 	return nil
 }
 

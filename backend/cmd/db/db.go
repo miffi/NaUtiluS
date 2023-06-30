@@ -11,6 +11,7 @@ import (
 type DbQuery interface {
 	QueryFullGraph(ctx context.Context) (types.Graph, error)
 	Close(ctx context.Context) error
+	MakeOr(ctx context.Context) (string, error)
 }
 
 type DbModify interface {
@@ -248,15 +249,7 @@ func (db *database) AddCluster(ctx context.Context, howMany int, courseNames []s
 
 func addRequiresTxFunc(ctx context.Context, source, target, grade string) neo4j.ManagedTransactionWorkT[neo4j.ResultSummary] {
 	if source == target {
-		// TODO Add logging of this error, and remove the dummy function.
-		// random function cause I don't have a logger set up in here
-		return func(tx neo4j.ManagedTransaction) (neo4j.ResultSummary, error) {
-			result, err := tx.Run(ctx, "MATCH (n) RETURN n LIMIT 1", nil)
-			if err != nil {
-				return nil, err
-			}
-			return result.Consume(ctx)
-		}
+		panic("addRequiresTxFunc: source should not equal target")
 	}
 
 	const query = `
@@ -284,7 +277,39 @@ func (db *database) AddRequires(ctx context.Context, source, target, grade strin
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
+	// Nothing happens if source is target: self-dependency is a circular
+	// dependency, therefore it's treated as a no-op.
+	if source == target {
+		// TODO setup logging and bark at whoever thought making passing in
+		// self-dependencies was a good idea.
+
+		return nil
+	}
+
 	summary, err := neo4j.ExecuteWrite(ctx, session, addRequiresTxFunc(ctx, source, target, grade))
 	db.logger.Trace().Interface("summary", summary).Msgf("")
 	return err
+}
+
+func (db *database) MakeOr(ctx context.Context) (string, error) {
+	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	return neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) (string, error) {
+		const query = `
+			CREATE (n:Or:Main {name: randomUUID()})
+			RETURN n.name
+		`
+		result, err := tx.Run(ctx, query, nil)
+		if err != nil {
+			return "", err
+		}
+
+		value, err := result.Single(ctx)
+		if err != nil {
+			return "", err
+		}
+
+		return value.Values[0].(string), nil
+	})
 }
