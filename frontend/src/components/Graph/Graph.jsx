@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide, forceLink, forceManyBody } from 'd3-force-3d'
+import {  forceLink, forceManyBody } from 'd3-force-3d'
 
 import './graph.css';
 
@@ -50,29 +50,29 @@ function Graph(props) {
 		}, [hoverNode, clickNode])
 
 	useEffect(() => {
-		if (props.oldData) {
+		if (props.graphData) {
 			fgRef.current
-			.d3Force('collide', forceCollide(26).strength(0.5))
+			// .d3Force('collide', forceCollide(26).strength(0.5))
 			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -30 : -500))
 			.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 20 : link.source.cluster === true ? 150 : 100))
 		}
 	}, [props.graphData]);
 
 // handle graph loading and error
-	// if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
-	// if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
+	if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
+	if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
 	return <ForceGraph2D
 		ref={fgRef}
 		className='force-graph-2D'
 		graphData={props.oldData}
 		width={displayWidth}
 		height={displayHeight}
-		minZoom={0.6}
 		maxZoom={10}
 		cooldownTicks={100}
 		onEngineStop={() => fgRef.current.zoom(1, 400)}
 		nodeAutoColorBy="department"
-		backgroundColor='#424242'
+		// backgroundColor='#424242'
+		backgroundColor='#787878'
 		nodeVal={50}
 		linkDirectionalArrowLength={
 			link => {

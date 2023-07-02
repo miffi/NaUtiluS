@@ -6,8 +6,8 @@ a {
 
 .menu-bar {
 	height: 100%;
-	width: 100px;
-	position: fixed;
+	width: 70px;
+	position: absolute;
 	z-index: 2;
 	background-color: #6b6b6b;
 	padding-top: 20px;
@@ -16,20 +16,25 @@ a {
 	align-items: center;
 }
 
-
-
 .filter-button,
-.description-button {
+.description-button,
+.search-button {
 	text-decoration: none;
-	padding: 10px 5px;
-	width: 75px;
 	text-align: center;
-	font-size: 12px;
-	background-color: #47738d;
+	font-size: 30px;
 	border-radius: 5px;
 	display: inline-block;
-	margin-top: 20px;
+	margin-top: 10px;
+	margin-bottom: 20px;
+	cursor: pointer;
+	color: #9bc;
 }
+
+/* .filter-button:hover,
+.description-button:hover,
+.search-button:hover {
+	color: #888;
+} */
 
 .content-container {
 	left: 100px;

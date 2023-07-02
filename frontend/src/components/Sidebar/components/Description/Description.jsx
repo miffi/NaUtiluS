@@ -19,39 +19,9 @@ function CourseInfo() {
 	);
 }
 
-function Search(props) {
-	function handleSearchSubmit() {
-		const courseName = document.getElementById('searchbar').value
-		const node = props.oldData.nodes.filter(node => node.id === courseName)
-		if (node[0] === undefined) {
-			props.openDesc(false, "Course not found!");
-		}
-		else {
-			const courseData = node[0]
-			props.graphRef.current.centerAt(props.toggleFilter ? courseData.x - 20 : courseData.x, courseData.y + 14, 400);
-			props.setXCoor(props.toggleFilter ? courseData.x - 20 : courseData.x);
-			props.setYCoor(courseData.y + 14);
-			props.graphRef.current.zoom(7, 400);
-			courseData.cluster === false
-					? props.fetchCourseInfo(courseData)
-					: props.openDesc(false, "Not a course node");
-		}
-	}
-
-	return (
-		<>
-			<h3 className='search-header'>Search</h3>
-			<input id='searchbar' className='searchbar' type="text" placeholder='Enter a course name' />
-			<button onClick={handleSearchSubmit}>Search</button>
-		</>
-		
-	);
-}
-
-function Description(props) {
+function Description() {
 	return (
 		<div className="menu-description" id="description">
-			<Search {...props}/>
 			<CourseInfo />
 		</div>
 	);
