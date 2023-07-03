@@ -9,10 +9,12 @@ function App() {
 	
 	// variables to store URI of important links
 	const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/fullGraph.json'
+	const filterURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/filter.json'
 
 	// variables to handle toggle of Filter and Description sidebars
 	const [toggleFilter, setToggleFilter] = useState(false)
 	const [toggleDesc, setToggleDesc] = useState(false)
+	const [toggleSearch, setToggleSearch] = useState(false)
 
 	// variables to handle fetching graph data
 	const [data, setData] = useState(null);
@@ -26,9 +28,8 @@ function App() {
 
 	// function to close Filter sidebar
 	function closeFilter() {
-		maximizeFilter();
 		setToggleFilter(false);
-		document.getElementById('filter').style.left = '-70%';
+		document.getElementById('filter').style.right = 'calc(100% - 70px)';
 	}
 
 	// function to open Filter sidebar
@@ -37,16 +38,14 @@ function App() {
 			minimizeFilter();
 		}
 		setToggleFilter(true);
-		document.getElementById('filter').style.left = '100px';
+		document.getElementById('filter').style.right = 'calc(100% - 361.5px)';
 	}
 
 	// function to close Description sidebar
 	function closeDesc() {
-		if (toggleFilter) {
-			maximizeFilter();
-		}
+		maximizeFilter();
 		setToggleDesc(false);
-		document.getElementById('description').style.bottom = '-100%';
+		document.getElementById('description').style.top = '100%';
 	}
 
 	// function to open Description sidebar
@@ -55,7 +54,7 @@ function App() {
 			minimizeFilter();
 		}
 		setToggleDesc(true);
-		document.getElementById('description').style.bottom = '0';
+		document.getElementById('description').style.top = '50%';
 
 		// handle course information
 		if (isCourse === false) {
@@ -96,17 +95,31 @@ function App() {
 		document.getElementById('filter').style.height = '100%';
 	}
 
-	// fetch data from backend
+	// function to close Search sidebar
+	function closeSearch() {
+		setToggleSearch(false);
+		document.getElementById('search').style.bottom = 'calc(100% + 70px)';
+	}
+
+	// function to open Search sidebar
+	function openSearch() {
+		setToggleSearch(true);
+		document.getElementById('search').style.bottom = 'calc(100% - 70px)';
+	}
+
+	// fetch graph data from backend
 	useEffect(() => {
 		fetch(graphURI)
 			.then(response => {
 				if (response.ok) {
+					console.log("graph data received")
 					return response.json();
 				}
 				throw response;
 			})
 			.then(data => {
 				setData(data);
+				console.log(data)
 			})
 			.catch(error => {
 				console.error("Error fetching graph data: ", error);
@@ -119,8 +132,7 @@ function App() {
 
 // fetch course information from nusmods
 	async function fetchCourseInfo(node) {
-		let modURI = "https://api.nusmods.com/v2/2022-2023/modules/" + node.id + ".json";
-
+		let modURI = "https://api.nusmods.com/v2/2023-2024/modules/" + node.id + ".json";
 		await fetch(modURI)
 			.then(response => {
 				if (response.ok) {
@@ -136,10 +148,45 @@ function App() {
 			})
 	}
 
+	const [courses, setCourses] = useState([])
+	const [coursesError, setCoursesError] = useState(null)
+	const [coursesLoading, setCoursesLoading] = useState(true)
+	
+	useEffect(() => {
+		if (loading) {
+			fetch("https://api.nusmods.com/v2/2023-2024/moduleInfo.json")
+				.then(response => {
+					if (response.ok) {
+						console.log("course data received");
+						return response.json();
+					}
+					throw response;
+				})
+				.then(data => {
+					setCourses(data);
+					console.log(data);
+				})
+				.catch(error => {
+					console.error("Error fetching courses list data: ", error);
+					setCoursesError(error);
+				})
+				.finally(() => {
+					setCoursesLoading(false);
+				})
+			}
+	}, []);
+	
+	const listOfDepartments = ["College of Design and Engineering", "College of Humanities and Sciences",
+		"Faculty of Arts and Social Sciences", "Faculty of Science",
+		"Residential College Programmes", "School of Business",
+		"School of Computing", "Yong Siew Toh Conservatory of Music"];
+	const listOfCourses = courses.filter(course => course.department === 'Computer Science').map(node => node.moduleCode)
+
 // pass on variables to props for other components  
 	let props = {
 		oldData: oldData,
 		graphURI: graphURI,
+		filterURI: filterURI,
 
 		graphData: data,
 		error: error,
@@ -150,14 +197,24 @@ function App() {
 
 		fetchCourseInfo: fetchCourseInfo,
 
+		coursesLoading: coursesLoading,
+		coursesError: coursesError,
+		listOfDepartments: listOfDepartments,
+		listOfCourses: listOfCourses,
+
 		toggleDesc: toggleDesc,
 		toggleFilter: toggleFilter,
+		toggleSearch: toggleSearch,
 		setToggleDesc: setToggleDesc,
 		setToggleFilter: setToggleFilter,
+		setToggleSearch: setToggleSearch,
+		
 		closeFilter: closeFilter,
 		openFilter: openFilter,
 		closeDesc: closeDesc,
 		openDesc: openDesc,
+		closeSearch: closeSearch,
+		openSearch: openSearch,
 		maximizeFilter: maximizeFilter,
 		minimizeFilter: minimizeFilter,
 
