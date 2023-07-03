@@ -297,7 +297,7 @@ func (db *database) MakeOr(ctx context.Context) (string, error) {
 
 	return neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) (string, error) {
 		const query = `
-			CREATE (n:Or:Main {name: randomUUID()})
+			CREATE (n:Cluster:Main {name: randomUUID(), howMany: -1})
 			RETURN n.name
 		`
 		result, err := tx.Run(ctx, query, nil)
