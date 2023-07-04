@@ -12,6 +12,8 @@ func (app *application) routes() http.Handler {
 
 	router.HandlerFunc(http.MethodGet, "/v1/fullGraph.json", app.fullGraph)
 	router.HandlerFunc(http.MethodPost, "/v1/filter.json", app.filterPost)
+	router.HandlerFunc(http.MethodGet, "/v1/courseSummary.json", app.courseSummary)
+	router.HandlerFunc(http.MethodGet, "/v1/course/:code", app.courseDetail)
 
 	return app.recoverPanic(app.enableCORS(router))
 }

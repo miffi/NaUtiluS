@@ -4,10 +4,11 @@ import (
 	"context"
 	"errors"
 	"os"
+	"time"
 
 	"github.com/miffi/nautilus/backend/cmd/db"
-	"github.com/miffi/nautilus/backend/cmd/rule"
 	"github.com/rs/zerolog"
+	"golang.org/x/time/rate"
 )
 
 func main() {
@@ -24,7 +25,7 @@ func main() {
 		logger.Fatal().Err(err).Msg("")
 	}
 
-	directory := "/home/max/dev/nautilus/backend/cmd/rule/testData/"
+	/* directory := "/home/max/dev/nautilus/backend/cmd/rule/testData/"
 
 	parser := rule.NewParser()
 	entries, err := os.ReadDir(directory)
@@ -54,9 +55,12 @@ func main() {
 		}
 
 		logger.Info().Msg("")
-	}
+	} */
 
-	/* summaries, err := query.GetCourseSummaries("2022-2023")
+	query := NewNUSModsQuery(logger)
+	ratelimit := rate.NewLimiter(rate.Every(2*time.Second), 4)
+
+	summaries, err := query.GetCourseSummaries("2022-2023")
 	if err != nil {
 		logger.Fatal().Err(err).Msg("")
 	}
@@ -77,5 +81,5 @@ func main() {
 		}
 
 		logger.Info().Str("Course", details.CourseCode).Msg("")
-	} */
+	}
 }
