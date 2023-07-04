@@ -29,7 +29,7 @@ function App() {
 	// function to close Filter sidebar
 	function closeFilter() {
 		setToggleFilter(false);
-		document.getElementById('filter').style.right = 'calc(100% - 70px)';
+		document.getElementById('filter').style.left = '-220px';
 	}
 
 	// function to open Filter sidebar
@@ -38,7 +38,7 @@ function App() {
 			minimizeFilter();
 		}
 		setToggleFilter(true);
-		document.getElementById('filter').style.right = 'calc(100% - 361.5px)';
+		document.getElementById('filter').style.left = '70px';
 	}
 
 	// function to close Description sidebar
@@ -98,13 +98,13 @@ function App() {
 	// function to close Search sidebar
 	function closeSearch() {
 		setToggleSearch(false);
-		document.getElementById('search').style.bottom = 'calc(100% + 70px)';
+		document.getElementById('search').style.top = '-55px';
 	}
 
 	// function to open Search sidebar
 	function openSearch() {
 		setToggleSearch(true);
-		document.getElementById('search').style.bottom = 'calc(100% - 70px)';
+		document.getElementById('search').style.top = '25px';
 	}
 
 	// fetch graph data from backend
@@ -130,7 +130,7 @@ function App() {
 			})
 	}, [graphURI]);
 
-// fetch course information from nusmods
+	// fetch course information from nusmods
 	async function fetchCourseInfo(node) {
 		let modURI = "https://api.nusmods.com/v2/2023-2024/modules/" + node.id + ".json";
 		await fetch(modURI)
@@ -148,10 +148,10 @@ function App() {
 			})
 	}
 
+	// fetch list of courses from nusmods
 	const [courses, setCourses] = useState([])
 	const [coursesError, setCoursesError] = useState(null)
 	const [coursesLoading, setCoursesLoading] = useState(true)
-	
 	useEffect(() => {
 		if (loading) {
 			fetch("https://api.nusmods.com/v2/2023-2024/moduleInfo.json")
@@ -175,7 +175,6 @@ function App() {
 				})
 			}
 	}, []);
-	
 	const listOfDepartments = ["College of Design and Engineering", "College of Humanities and Sciences",
 		"Faculty of Arts and Social Sciences", "Faculty of Science",
 		"Residential College Programmes", "School of Business",
@@ -224,6 +223,7 @@ function App() {
 		setYCoor: setYCoor,
 		setXCoor: setXCoor
 	}
+	
 	return (
 		<div className='App'>
 			<Sidebar {...props} />

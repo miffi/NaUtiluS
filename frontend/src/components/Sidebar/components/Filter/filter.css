@@ -1,16 +1,13 @@
 .menu-filter {
-	right: calc(100% - 70px);
+	left: -220px;
 	height: 100%;
 	width: 270px;
 	padding-left: 10px;
 	padding-right: 10px;
-	border-style: solid;
-	border-width: 1px;
-	border-color: azure;
 	position: fixed;
 	background-color: #3a3a3a;
 	z-index: 1;
-	transition: right 200ms ease, height 200ms ease;
+	transition: left 200ms ease, height 200ms ease;
 	overflow: auto;
 	margin: none;
 	border-width: 1px;

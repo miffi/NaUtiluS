@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './sidebar.css';
 import { HiFilter, HiDotsCircleHorizontal, HiSearch } from "react-icons/hi"
 import Filter from './components/Filter/Filter';
@@ -6,6 +6,20 @@ import Description from './components/Description/Description';
 import Search from './components/Search/Search';
 
 function Sidebar(props) {
+	const [toggleSuggestions, setToggleSuggestions] = useState(false);
+
+	function removeSuggestions() {
+		setToggleSuggestions(false);
+		document.getElementById('search-suggestions').style.display = 'none';
+	}
+
+	const newProps = {
+		...props,
+		toggleSuggestions: toggleSuggestions,
+		setToggleSuggestions: setToggleSuggestions,
+		removeSuggestions: removeSuggestions
+	}
+
 	return (
 		<>
 			<div className='menu-bar' id='menu_bar'>
@@ -52,7 +66,8 @@ function Sidebar(props) {
 				<HiSearch id='search-button' title="Search" className="search-button" onClick={
 					() => {
 						if (props.toggleSearch) {
-							props.closeSearch(); /*TODO*/
+							props.closeSearch();
+							removeSuggestions();
 							document.getElementById('search-button').style.color = '#9bc';
 						} else {
 							props.openSearch(); /*TODO*/
@@ -73,7 +88,7 @@ function Sidebar(props) {
 			<div className='content-container'>
 				<Filter {...props} />
 				<Description/>
-				<Search {...props} />
+				<Search {...newProps} />
 			</div>
 
 		</>

@@ -7,9 +7,6 @@
 	padding-left: 10px;
 	padding-right: 10px;
 	position: fixed;
-	border-style: solid;
-	border-width: 1px;
-	border-color: white;
 	background-color: #3a3a3a;
 	z-index: inherit;
 	transition: top 200ms ease;
