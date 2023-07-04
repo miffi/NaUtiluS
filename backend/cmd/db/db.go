@@ -14,6 +14,7 @@ type DbQuery interface {
 	MakeOr(ctx context.Context) (string, error)
 	CourseSummaries(ctx context.Context) ([]types.Summary, error)
 	CourseDetail(ctx context.Context, code string) (types.Detail, error)
+	Departments(ctx context.Context) ([]string, error)
 }
 
 type DbModify interface {
@@ -403,4 +404,33 @@ func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail
 	}
 
 	return detail, nil
+}
+
+func (db *database) Departments(ctx context.Context) ([]string, error) {
+	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	return neo4j.ExecuteRead(ctx, session, func(tx neo4j.ManagedTransaction) ([]string, error) {
+		const query = `
+		    MATCH (department:Department)
+		    RETURN department.name as names
+		`
+
+		result, err := tx.Run(ctx, query, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		var names []string
+		for result.Next(ctx) {
+			name := result.Record().Values[0].(string)
+			names = append(names, name)
+		}
+
+		if err = result.Err(); err != nil {
+			return nil, err
+		}
+
+		return names, nil
+	})
 }
