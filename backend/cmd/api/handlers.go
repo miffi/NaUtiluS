@@ -3,8 +3,10 @@ package main
 import (
 	"encoding/json"
 	"net/http"
+	"strings"
 
-	"github.com/miffi/nautilus/backend/cmd/db"
+	"github.com/julienschmidt/httprouter"
+	"github.com/miffi/nautilus/backend/cmd/api/types"
 )
 
 func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
@@ -20,13 +22,41 @@ func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
 }
 
 func (app *application) filterPost(w http.ResponseWriter, r *http.Request) {
-	var options db.FilterOptions
+	var options types.FilterOptions
 	err := json.NewDecoder(r.Body).Decode(&options)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
 	}
 	// TODO Write actual filtering logic
 	err = app.writeJSON(w, http.StatusOK, nil, nil)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
+
+func (app *application) courseSummary(w http.ResponseWriter, r *http.Request) {
+	data, err := app.dbquery.CourseSummaries(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+	}
+
+	err = app.writeJSON(w, http.StatusOK, data, nil)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
+
+func (app *application) courseDetail(w http.ResponseWriter, r *http.Request) {
+	params := httprouter.ParamsFromContext(r.Context())
+
+	code := strings.TrimSuffix(params.ByName("code"), ".json")
+	course, err := app.dbquery.CourseDetail(r.Context(), code)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, course, nil)
 	if err != nil {
 		app.serverError(w, err)
 	}

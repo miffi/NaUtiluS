@@ -1,0 +1,45 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		(
+			COURSES (1) EC3101:B-
+			AND
+			COURSES (1) EC3102:A
+		)
+		OR
+		(
+			COURSES (1) EC3101:B
+			AND
+			COURSES (1) EC3102:A-
+		)
+		OR
+		(
+			COURSES (1) EC3101:B+
+			AND
+			COURSES (1) EC3102:B+
+		)
+		OR
+		(
+			COURSES (1) EC3101:A-
+			AND
+			COURSES (1) EC3102:B
+		)
+		OR
+		(
+			COURSES (1) EC3101:A
+			AND
+			COURSES (1) EC3102:B-
+		)
+	)
+	AND
+	UNITS (80)
+	AND
+	COURSES (7) EC%:D
+	AND
+	(
+		GPA (3.2)
+		OR
+		SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+	)
+)

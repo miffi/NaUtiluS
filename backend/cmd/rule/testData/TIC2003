@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (2) TIC2001:D,TIC2601:D
+)

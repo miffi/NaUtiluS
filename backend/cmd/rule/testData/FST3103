@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (2) FST1101:D,FST1103:D
+)

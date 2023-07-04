@@ -1,0 +1,11 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		COURSES (1) CM1121:D,CM1501:D
+		AND
+		COURSES (1) BN2301:D
+	)
+	OR
+	COURSES (1) MLE3104:D
+)

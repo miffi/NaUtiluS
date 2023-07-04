@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (1) TRA2101:D,CL2280:D,CL2281:D
+)

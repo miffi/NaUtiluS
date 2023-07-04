@@ -1,0 +1,35 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	UNITS (80)
+	AND
+	(
+		COURSES (7) MS%:D
+		OR
+		COURSES (7) SC%:D
+		OR
+		(
+			COHORT_YEARS MUST_BE_IN S:2012
+			AND
+			2ND_MAJOR MUST_BE_IN (1) 0110GLHON
+		)
+	)
+	AND
+	(
+		(
+			(
+				COHORT_YEARS MUST_BE_IN E:2011
+				AND
+				GPA (3.5)
+			)
+			OR
+			(
+				COHORT_YEARS MUST_BE_IN S:2012
+				AND
+				GPA (3.2)
+			)
+		)
+		OR
+		SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+	)
+)

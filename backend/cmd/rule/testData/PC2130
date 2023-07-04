@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (2) PC1101:D,PC2174A:D
+)

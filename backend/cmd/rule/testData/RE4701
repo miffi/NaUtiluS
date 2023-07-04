@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (2) RE3703:D,RE3704:D
+)

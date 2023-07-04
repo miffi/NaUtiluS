@@ -1,0 +1,7 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	SUBJECTS (1) 07:E,06:E
+	OR
+	COURSES (1) MA1301:D,MA1301X:D
+)

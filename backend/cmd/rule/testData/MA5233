@@ -1,0 +1,5 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	COURSES (1) MA3228:D,MA4255:D,MA4230:D
+)

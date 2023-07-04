@@ -1,0 +1,3 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(COURSES (1) LAB1201:D)

@@ -1,5 +1,7 @@
 # NaUtiluS
 
+A graph of all the modules of NUS
+
 ### Running a dev build of the backend
 - Install [just](https://github.com/casey/just)
 - Add a .env file in the project root with

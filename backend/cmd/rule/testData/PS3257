@@ -1,0 +1,1 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree THEN ( ( COURSES (3) PS%:D OR COURSES (4) GL%:D ) )

@@ -1,0 +1,7 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	GPA (4)
+	AND
+	UNITS (40)
+)

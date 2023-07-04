@@ -1,0 +1,11 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		COURSES (1) CN3108:D
+	)
+	AND
+	(
+		COURSES (4) CN3121:D,CN3124:D,CN3132:D,CN3135:D,CN3421:D
+	)
+)

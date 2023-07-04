@@ -1,0 +1,27 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	UNITS (80)
+	AND
+	(
+		(
+			COURSES (7) GE%:D
+			AND
+			(
+				(
+					COHORT_YEARS MUST_BE_IN S:2012
+					AND
+					GPA (3.2)
+				)
+				OR
+				SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+			)
+		)
+		OR
+		(
+			PROGRAMS MUST_BE_IN (1) 0105NVGHON,1000NVBHON,1001BESXDP
+			AND
+			SPECIAL MUST_BE_IN "ACAD_LEVEL=4"
+		)
+	)
+)

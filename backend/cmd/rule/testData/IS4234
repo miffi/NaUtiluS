@@ -1,0 +1,15 @@
+PROGRAM_TYPES IF_IN Undergraduate Degree
+THEN
+(
+	(
+		COURSES (2) IS2102:D,IS2103:D
+	)
+	OR
+	(
+		COURSES (1) BT3103:D
+	)
+	OR
+	(
+		COURSES (1) CS2103:D,CS2103T:D,CS2113:D,CS2113T:D
+	)
+)
