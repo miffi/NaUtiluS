@@ -61,3 +61,16 @@ func (app *application) courseDetail(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 }
+
+func (app *application) departments(w http.ResponseWriter, r *http.Request) {
+	departments, err := app.dbquery.Departments(r.Context())
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, departments, nil)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
