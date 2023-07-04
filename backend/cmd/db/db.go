@@ -12,6 +12,8 @@ type DbQuery interface {
 	QueryFullGraph(ctx context.Context) (types.Graph, error)
 	Close(ctx context.Context) error
 	MakeOr(ctx context.Context) (string, error)
+	CourseSummaries(ctx context.Context) ([]types.Summary, error)
+	CourseDetail(ctx context.Context, code string) (types.Detail, error)
 }
 
 type DbModify interface {
@@ -142,14 +144,26 @@ func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.Man
 	return func(tx neo4j.ManagedTransaction) (any, error) {
 		const courseAddQuery = `
 			MERGE (course:Course:Main {name: $name})
+			SET course.title = $title,
+				course.faculty = $faculty,
+				course.description = $description,
+				course.preclusion = $preclusion,
+			    course.prerequisite = $prerequisite,
+				course.credit = $credit
 			MERGE (department:Department {name: $department})
 			MERGE (course)-[:IN_DEPARTMENT]->(department)
 			RETURN course.name
 		`
 		result, err := tx.Run(ctx, courseAddQuery,
 			map[string]any{
-				"name":       details.CourseCode,
-				"department": details.Department,
+				"name":         details.CourseCode,
+				"faculty":      details.Faculty,
+				"department":   details.Department,
+				"title":        details.Title,
+				"description":  details.Description,
+				"preclusion":   details.Preclusion,
+				"prerequisite": details.Prerequisite,
+				"credit":       details.CourseCredit,
 			})
 		if err != nil {
 			return nil, err
@@ -312,4 +326,81 @@ func (db *database) MakeOr(ctx context.Context) (string, error) {
 
 		return value.Values[0].(string), nil
 	})
+}
+
+func (db *database) CourseSummaries(ctx context.Context) ([]types.Summary, error) {
+	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	return neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) ([]types.Summary, error) {
+		const query = `
+			MATCH (n:Course)
+			RETURN n.name as code, n.title as title
+		`
+		result, err := tx.Run(ctx, query, nil)
+		if err != nil {
+			return nil, err
+		}
+
+		var summaries []types.Summary
+		for result.Next(ctx) {
+			value := result.Record().AsMap()
+			summaries = append(summaries, types.Summary{
+				Code:  value["code"].(string),
+				Title: value["title"].(string),
+			})
+		}
+
+		if err = result.Err(); err != nil {
+			return nil, err
+		}
+
+		return summaries, nil
+	})
+}
+
+func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail, error) {
+	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	db.logger.Debug().Str("Code", code).Str("Function", "CourseDetail").Msg("")
+
+	detail, err := neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) (types.Detail, error) {
+		const query = `
+			MATCH (n:Course {name: $name})-[:IN_DEPARTMENT]->(department:Department)
+			RETURN n, department.name as department
+		`
+		result, err := tx.Run(ctx, query, map[string]any{
+			"name": code,
+		})
+		if err != nil {
+			return types.Detail{}, err
+		}
+
+		value, err := result.Single(ctx)
+		if err != nil {
+			return types.Detail{}, err
+		}
+
+		node := value.Values[0].(neo4j.Node)
+		props := node.Props
+
+		department := value.Values[1].(string)
+
+		return types.Detail{
+			Preclusion:   props["preclusion"].(string),
+			Prerequisite: props["prerequisite"].(string),
+			Description:  props["description"].(string),
+			Title:        props["title"].(string),
+			Department:   department,
+			Faculty:      props["faculty"].(string),
+			Code:         code,
+			Credit:       props["credit"].(string),
+		}, nil
+	})
+	if err != nil {
+		return types.Detail{}, err
+	}
+
+	return detail, nil
 }
