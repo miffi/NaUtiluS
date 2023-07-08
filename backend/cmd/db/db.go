@@ -143,6 +143,11 @@ func (db *database) QueryFullGraph(ctx context.Context) (types.Graph, error) {
 
 func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.ManagedTransactionWork {
 	return func(tx neo4j.ManagedTransaction) (any, error) {
+		var semesters []string
+		for _, data := range details.SemesterData {
+			semesters = append(semesters, parseSemester(data.Number))
+		}
+
 		const courseAddQuery = `
 			MERGE (course:Course:Main {name: $name})
 			SET course.title = $title,
@@ -150,7 +155,8 @@ func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.Man
 				course.description = $description,
 				course.preclusion = $preclusion,
 			    course.prerequisite = $prerequisite,
-				course.credit = $credit
+				course.credit = $credit,
+				course.semester = $semester
 			MERGE (department:Department {name: $department})
 			MERGE (course)-[:IN_DEPARTMENT]->(department)
 			RETURN course.name
@@ -165,11 +171,26 @@ func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.Man
 				"preclusion":   details.Preclusion,
 				"prerequisite": details.Prerequisite,
 				"credit":       details.CourseCredit,
+				"semester":     semesters,
 			})
 		if err != nil {
 			return nil, err
 		}
 		return result.Consume(ctx)
+	}
+}
+
+func parseSemester(num int) string {
+	switch num {
+	case 2:
+		return "Semester 2"
+	case 3:
+		return "Special Semester 1"
+	case 4:
+		return "Special Semester 2"
+	// no obvious way to handle other numbers
+	default:
+		return "Semester 1"
 	}
 }
 
@@ -388,6 +409,11 @@ func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail
 
 		department := value.Values[1].(string)
 
+		var semesters []string
+		for _, semester := range props["semester"].([]any) {
+			semesters = append(semesters, semester.(string))
+		}
+
 		return types.Detail{
 			Preclusion:   props["preclusion"].(string),
 			Prerequisite: props["prerequisite"].(string),
@@ -397,6 +423,7 @@ func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail
 			Faculty:      props["faculty"].(string),
 			Code:         code,
 			Credit:       props["credit"].(string),
+			Semesters:    semesters,
 		}, nil
 	})
 	if err != nil {

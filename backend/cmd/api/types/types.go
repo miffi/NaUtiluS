@@ -27,9 +27,15 @@ type CourseDetails struct {
 	CourseCode   string `json:"moduleCode"`
 	CourseCredit string `json:"moduleCredit"`
 
+	SemesterData []Semester `json:"semesterData"`
+
 	PrerequisiteRule string `json:"prerequisiteRule"`
 	PreclusionRule   string `json:"preclusionRule"`
 	CorequisiteRule  string `json:"courequisiteRule"`
+}
+
+type Semester struct {
+	Number int `json:"semester"`
 }
 
 // Type holding a summary of a course.
@@ -57,6 +63,8 @@ type Detail struct {
 
 	Code   string `json:"courseCode"`
 	Credit string `json:"credit"`
+
+	Semesters []string `json:"semesters"`
 }
 
 // The data of a frontend force-graph node
