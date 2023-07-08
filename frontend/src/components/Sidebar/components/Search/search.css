@@ -27,8 +27,8 @@
 	outline: none;
 }
 
-.search-execute,
-.search-minimize {
+.search-expand,
+.search-collapse {
 	background-color: white;
 	color: #555;
 	width: 30px;
@@ -41,8 +41,8 @@
 	font-size: 0;
 }
 
-.search-execute:hover,
-.search-minimize:hover {
+.search-expand:hover,
+.search-collapse:hover {
 	cursor: pointer;
 	background-color: grey;
 	color: white;
@@ -82,6 +82,6 @@
 	cursor: pointer;
 }
 
-.search-suggestions ul li:hover {
+.search-suggestions ul .course-choices:hover {
 	background: #e9f3ff;
 }

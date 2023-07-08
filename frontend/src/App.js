@@ -10,16 +10,13 @@ function App() {
 	// variables to store URI of important links
 	const graphURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/fullGraph.json'
 	const filterURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/filter.json'
+	const courseSummaryURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/courseSummary.json'
+	const departmentsURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/departments.json'
 
 	// variables to handle toggle of Filter and Description sidebars
 	const [toggleFilter, setToggleFilter] = useState(false)
 	const [toggleDesc, setToggleDesc] = useState(false)
 	const [toggleSearch, setToggleSearch] = useState(false)
-
-	// variables to handle fetching graph data
-	const [data, setData] = useState(null);
-	const [error, setError] = useState(null);
-	const [loading, setLoading] = useState(true);
 
 	// variables to set center of graph
 	const [xCoor, setXCoor] = useState(0);
@@ -63,25 +60,27 @@ function App() {
 			document.getElementById('description_content').style.display = "none";
 			document.getElementById('description_placeholder').innerHTML = content
 		} else {
-			const title = content.moduleCode + " " + content.title
+			const title = content.courseCode + " " + content.title
 			const description = content.description;
-			const semesters = content.semesterData
-				.map(sem => sem.semester === 1 || sem.semester === 2
-						? "Semester " + sem.semester
-						: sem.semester === 3
-						? "Special Semester 1"
-						: sem.semester === 4
-						? "Special Semester 2"
-						: "Unspecified")
-				.reduce(
-					(accumulator, currentValue) => accumulator + ", " + currentValue
-				)
+			// const semesters = content.semesterData
+			// 	.map(sem => sem.semester === 1 || sem.semester === 2
+			// 			? "Semester " + sem.semester
+			// 			: sem.semester === 3
+			// 			? "Special Semester 1"
+			// 			: sem.semester === 4
+			// 			? "Special Semester 2"
+			// 			: "Unspecified")
+			// 	.reduce(
+			// 		(accumulator, currentValue) => accumulator + ", " + currentValue
+			// 	)
+			const prereqs = content.prerequisite;
 
 			document.getElementById('description_header').innerHTML = title;
 			document.getElementById('description_placeholder').style.display = "none";
 			document.getElementById('description_content').style.display = "block";
 			document.getElementById('course_info').innerHTML = description;
-			document.getElementById('semester_content').innerHTML = semesters;
+			// document.getElementById('semester_content').innerHTML = semesters;
+			document.getElementById('prereq_content').innerHTML = prereqs;
 		}
 	}
 
@@ -108,6 +107,9 @@ function App() {
 	}
 
 	// fetch graph data from backend
+	const [graphData, setGraphData] = useState(null);
+	const [graphError, setGraphError] = useState(null);
+	const [graphLoading, setGraphLoading] = useState(true);
 	useEffect(() => {
 		fetch(graphURI)
 			.then(response => {
@@ -118,22 +120,74 @@ function App() {
 				throw response;
 			})
 			.then(data => {
-				setData(data);
+				setGraphData(data);
 				console.log(data)
 			})
 			.catch(error => {
 				console.error("Error fetching graph data: ", error);
-				setError(error);
+				setGraphError(error);
 			})
 			.finally(() => {
-				setLoading(false);
+				setGraphLoading(false);
 			})
 	}, [graphURI]);
 
+	// fetch list of courses from nusmods
+	const [courses, setCourses] = useState([])
+	const [coursesError, setCoursesError] = useState(null)
+	const [coursesLoading, setCoursesLoading] = useState(true)
+	useEffect(() => {
+		fetch(courseSummaryURI)
+			.then(response => {
+				if (response.ok) {
+					console.log("course data received");
+					return response.json();
+				}
+				throw response;
+			})
+			.then(data => {
+				setCourses(data);
+				console.log(data);
+			})
+			.catch(error => {
+				console.error("Error fetching courses list data: ", error);
+				setCoursesError(error);
+			})
+			.finally(() => {
+				setCoursesLoading(false);
+			})
+	}, []);
+
+	// fetch list of departments from nusmods
+	const [departments, setDepartments] = useState([])
+	const [departmentsError, setDepartmentsError] = useState(null)
+	const [departmentsLoading, setDepartmentsLoading] = useState(true)
+	useEffect(() => {
+		fetch(departmentsURI)
+			.then(response => {
+				if (response.ok) {
+					console.log("departments data received");
+					return response.json();
+				}
+				throw response;
+			})
+			.then(data => {
+				setDepartments(data);
+				console.log(data);
+			})
+			.catch(error => {
+				console.error("Error fetching departments list data: ", error);
+				setDepartmentsError(error);
+			})
+			.finally(() => {
+				setDepartmentsLoading(false);
+			})
+	}, []);
+
 	// fetch course information from nusmods
 	async function fetchCourseInfo(node) {
-		let modURI = "https://api.nusmods.com/v2/2023-2024/modules/" + node.id + ".json";
-		await fetch(modURI)
+		let courseURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/course/' + node.id + ".json";
+		await fetch(courseURI)
 			.then(response => {
 				if (response.ok) {
 					return response.json();
@@ -141,6 +195,7 @@ function App() {
 				throw response;
 			})
 			.then(data => {
+				console.log(data);
 				openDesc(true, data)
 			})
 			.catch(error => {
@@ -148,58 +203,27 @@ function App() {
 			})
 	}
 
-	// fetch list of courses from nusmods
-	const [courses, setCourses] = useState([])
-	const [coursesError, setCoursesError] = useState(null)
-	const [coursesLoading, setCoursesLoading] = useState(true)
-	useEffect(() => {
-		if (loading) {
-			fetch("https://api.nusmods.com/v2/2023-2024/moduleInfo.json")
-				.then(response => {
-					if (response.ok) {
-						console.log("course data received");
-						return response.json();
-					}
-					throw response;
-				})
-				.then(data => {
-					setCourses(data);
-					console.log(data);
-				})
-				.catch(error => {
-					console.error("Error fetching courses list data: ", error);
-					setCoursesError(error);
-				})
-				.finally(() => {
-					setCoursesLoading(false);
-				})
-			}
-	}, []);
-	const listOfDepartments = ["College of Design and Engineering", "College of Humanities and Sciences",
-		"Faculty of Arts and Social Sciences", "Faculty of Science",
-		"Residential College Programmes", "School of Business",
-		"School of Computing", "Yong Siew Toh Conservatory of Music"];
-	const listOfCourses = courses.filter(course => course.department === 'Computer Science').map(node => node.moduleCode)
-
 // pass on variables to props for other components  
 	let props = {
 		oldData: oldData,
 		graphURI: graphURI,
 		filterURI: filterURI,
 
-		graphData: data,
-		error: error,
-		loading: loading,
-		setData: setData,
-		setError: setError,
-		setLoading: setLoading,
+		graphData: graphData,
+		error: graphError,
+		loading: graphLoading,
+		setData: setGraphData,
+		setError: setGraphError,
+		setLoading: setGraphLoading,
 
 		fetchCourseInfo: fetchCourseInfo,
 
 		coursesLoading: coursesLoading,
 		coursesError: coursesError,
-		listOfDepartments: listOfDepartments,
-		listOfCourses: listOfCourses,
+		departmentsError: departmentsError,
+		departmentsLoading: departmentsLoading,
+		listOfDepartments: departments,
+		listOfCourses: courses,
 
 		toggleDesc: toggleDesc,
 		toggleFilter: toggleFilter,

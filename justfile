@@ -11,3 +11,6 @@ debug-backend:
 
 update:
   cd backend/cmd/courseSync; go run .
+
+start:
+  cd frontend; npm start

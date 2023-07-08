@@ -1,23 +1,36 @@
 import React, { useState } from 'react';
 import './search.css';
-import { HiSearch, HiChevronUp } from "react-icons/hi"
+import { HiChevronDown, HiChevronUp } from "react-icons/hi"
 
 function Search(props) {
 	const availableChoices = props.listOfCourses;
-	const [autoComplete, setAutoComplete] = useState([])
+	const [autoComplete, setAutoComplete] = useState(null);
+	const [toggleSuggestions, setToggleSuggestions] = useState(false);
+	
+	function displaySuggestions() {
+		setToggleSuggestions(true);
+		document.getElementById('search-suggestions').style.display = 'block';
+	}
+
+	function removeSuggestions() {
+		setToggleSuggestions(false);
+		document.getElementById('search-suggestions').style.display = 'none';
+	}
 
 	function handleSearchSubmit() {
 		if (props.graphData === null) {
 			window.alert("The server is currently down, please try again later");
 			return;
 		}
-		const courseName = document.getElementById('search-bar').value
+		const courseName = document.getElementById('search-bar').value.split(' ')[0];
+		console.log(courseName);
 		const node = props.graphData.nodes.filter(node => node.id === courseName)
 		if (node[0] === undefined) {
 			props.openDesc(false, "Course not found!");
 		}
 		else {
 			const courseData = node[0]
+			console.log(courseData)
 			props.graphRef.current.centerAt(props.toggleFilter ? courseData.x - 20 : courseData.x, courseData.y + 14, 400);
 			props.setXCoor(props.toggleFilter ? courseData.x - 20 : courseData.x);
 			props.setYCoor(courseData.y + 14);
@@ -35,34 +48,47 @@ function Search(props) {
     }
 	}
 
-	function displaySuggestions() {
-		props.setToggleSuggestions(true);
-		document.getElementById('search-suggestions').style.display = 'block';
-	}
-
-	function substituteContent(list) {
-		document.getElementById('search-bar').value = list;
-		props.removeSuggestions()
-	}
-
-	const removeSuggestions = props.removeSuggestions;
+	// function substituteContent(course) {
+	// 	if (props.graphData === null) {
+	// 		window.alert("The server is currently down, please try again later");
+	// 		return;
+	// 	}
+	// 	const courseText = course.courseCode + ' ' + course.title;
+	// 	document.getElementById('search-bar').value = courseText;
+	// 	handleSearchSubmit(courseText);
+	// 	removeSuggestions()
+	// }
 
 	function handleFilterChoices() {
+		displaySuggestions();
 		let matchedChoices = [];
 		let input = document.getElementById('search-bar').value;
 		if (input.length) {
-			displaySuggestions();
-			matchedChoices = availableChoices.filter(choice => choice.toLowerCase().includes(input.toLowerCase()))
+			matchedChoices = availableChoices.filter(course => {
+				const courseText = course.courseCode.toLowerCase() + ' ' + course.title.toLowerCase();
+				return courseText.includes(input.toLowerCase())
+			})
+		} else if (input.length === 0) {
+			matchedChoices = availableChoices;
 		}
-		if (input.length === 0 || !matchedChoices.length) {
-			removeSuggestions();
+		let content;
+		if (!matchedChoices.length) {
+			content =
+			<ul>
+				<li key={'none'}>None matches your search</li>
+			</ul>
 		}
-		const content =
-		<ul>
-			{matchedChoices.map(course => {
-			return <li key={course} onClick={() => substituteContent(course)}>{course}</li>;
-		})}
-		</ul>
+		else {
+			content =
+			<ul>
+				{matchedChoices.map(course => {
+					const courseText = course.courseCode + ' ' + course.title
+					const courseCode = course.courseCode;
+					return <li key={courseCode} className={'course-choices'}
+						onClick={() => handleSearchSubmit(courseText)} onMouseDown={() => event.preventDefault()}>{courseText}</li>;
+				})}
+			</ul>
+		}
 		setAutoComplete(content);
 	}
 
@@ -70,12 +96,15 @@ function Search(props) {
 	<>
 	<div id='search' className='search-container'>
 		<input id='search-bar' className='search-bar' type="text" placeholder='Enter a course name'
-		onKeyDown={handleKeyDown} autoComplete='off'
+		onKeyDown={handleKeyDown} autoComplete='off' onFocus={handleFilterChoices} onBlur={removeSuggestions}
 		onKeyUp={handleFilterChoices}/>
 		{
-			props.toggleSuggestions
-			? <HiChevronUp id='search-minimize' className='search-minimize' onClick={props.removeSuggestions} />
-			: <HiSearch id='search-execute' className='search-execute' onClick={handleSearchSubmit} />
+			toggleSuggestions
+			? <HiChevronUp id='search-collapse' className='search-collapse' onClick={removeSuggestions} />
+			: <HiChevronDown id='search-expand' className='search-expand' onClick={() =>{
+				displaySuggestions();
+				document.getElementById('search-bar').focus();
+			}} />
 		}
 	</div>
 	<div id='search-suggestions' className='search-suggestions'>

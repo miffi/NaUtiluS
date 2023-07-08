@@ -6,7 +6,7 @@
 	padding-right: 10px;
 	position: fixed;
 	background-color: #3a3a3a;
-	z-index: 1;
+	z-index: inherit;
 	transition: left 200ms ease, height 200ms ease;
 	overflow: auto;
 	margin: none;

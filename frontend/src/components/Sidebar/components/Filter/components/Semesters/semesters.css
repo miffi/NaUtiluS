@@ -1,0 +1,82 @@
+.semesters-label {
+	padding-left: 2px;
+}
+
+.semesters-container {
+	width: 250px;
+	padding: none;
+	margin: 7px 0px 2px 3px;
+	padding: 0;
+	border-radius: 3px;
+	background-color: #ee8181;
+	display: flex;
+	align-items: center;
+}
+
+.semesters-search {
+	flex: 1;
+	font-size: 12px;
+	width: 100%;
+	height: 30px;
+	margin: none;
+	padding-left: 10px;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	border: none;
+	outline: none;
+	color: #555;
+}
+
+.semesters-expand,
+.semesters-collapse {
+	background-color: white;
+	color: #555;
+	width: 30px;
+	height: 32px;
+	padding: none;
+	margin: none;
+	border-width: 0;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.semesters-expand:hover,
+.semesters-collapse:hover {
+	cursor: pointer;
+	background-color: grey;
+	color: white;
+}
+
+.semesters-suggestions {
+	width: 250px;
+	max-height: 300px;
+	margin: 0px 0px 10px 3px;
+	border-radius: 3px;
+	background-color: #f8f7f7;
+	color: #555;
+	font-size: 12px;
+	overflow-y: auto;
+	z-index: 2;
+	position: absolute;
+	display: none;
+}
+
+.semesters-suggestions ul {
+	padding-left: 5px;
+	padding-right: 5px;
+	margin-block-start: 5px;
+	margin-block-end: 5px;
+}
+
+.semesters-suggestions ul li {
+	list-style: none;
+	border-radius: 3px;
+	padding-top: 5px;
+	padding-bottom: 6px;
+	padding-left: 6px;
+	cursor: pointer;
+}
+
+.semesters-suggestions ul .semesters-choices:hover {
+	background: #e9f3ff;
+}
