@@ -1,6 +1,7 @@
 .departments-label {
 	padding-left: 2px;
 }
+
 .departments-container {
 	width: 250px;
 	padding: none;
@@ -78,4 +79,47 @@
 
 .departments-suggestions ul .departments-choices:hover {
 	background: #e9f3ff;
+}
+
+.departments-selected {
+	background-color: rgb(220, 220, 220);
+	margin: 0px 0px 10px 3px;
+	padding: 5px 10px;
+	width: 230px;
+	border-radius: 3px;
+	font-size: 12px;
+	align-items: center;
+}
+
+.departments-selected .selected-option {
+	background-color: #99ccaa;
+	width: fit-content;
+	height: fit-content;
+	padding: 3px 6px;
+	margin: 3px 0px;
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+}
+
+.selected-label {
+	color: #333;
+	padding-right: 10px;
+	transition: color 200ms;
+}
+
+.deselect {
+	color: #333;
+	width: 10px;
+	height: 16px;
+	padding: none;
+	margin: none;
+	border-width: 0;
+	cursor: pointer;
+}
+
+.department-warning {
+	padding-left: 2px;
+	font-size: small;
+	color: #ff6363;
 }

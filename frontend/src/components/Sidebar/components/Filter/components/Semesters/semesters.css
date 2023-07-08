@@ -14,17 +14,19 @@
 }
 
 .semesters-search {
+	background-color: white;
 	flex: 1;
 	font-size: 12px;
-	width: 100%;
+	width: fit-content;
 	height: 30px;
-	margin: none;
+	margin: auto;
 	padding-left: 10px;
 	border-top-left-radius: 3px;
 	border-bottom-left-radius: 3px;
 	border: none;
 	outline: none;
 	color: #555;
+	cursor: initial;
 }
 
 .semesters-expand,
@@ -75,6 +77,10 @@
 	padding-bottom: 6px;
 	padding-left: 6px;
 	cursor: pointer;
+}
+
+.semesters-suggestions ul .semesters-choices {
+	height: 18px;
 }
 
 .semesters-suggestions ul .semesters-choices:hover {

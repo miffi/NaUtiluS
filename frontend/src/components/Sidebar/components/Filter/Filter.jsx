@@ -7,18 +7,12 @@ import Semesters from './components/Semesters/Semesters';
 function Filter(props) {
 	const [toggleDepartments, setToggleDepartments] = useState(false);
 	const [toggleCourses, setToggleCourses] = useState(false);
+	const [selectedDepartments, setSelectedDepartments] = useState([])
+	const [selectedCourses, setSelectedCourses] = useState([])
+	
 
 	function handleSubmit() {
-		let departments = document.getElementsByClassName("department-item");
-		let courses = document.getElementsByClassName("course-item");
-		let semester = document.getElementById("semester_dropdown").value;
-
-		let selectedDepartments = [...departments]
-			.filter(option => option.ariaSelected === "true")
-			.map(option => option.ariaLabel);
-		let selectedCourses = [...courses]
-			.filter(option => option.ariaSelected === "true")
-			.map(option => option.ariaLabel);
+		let semester = document.getElementById('semesters-search').value;
 
 		const filterObject = {
 			department: selectedDepartments,
@@ -49,50 +43,18 @@ function Filter(props) {
 			);
 	}
 
-	function handleDepartmentCheckboxChange(index) {
-		const optionId = "department-" + index;
-		const checkboxId = "department-checkbox-" + index;
-		const option = document.getElementById(optionId);
-		const checkbox = document.getElementById(checkboxId);
-		if (option.ariaSelected === "false") {
-			option.ariaSelected = "true";
-			checkbox.checked = true;
-		}
-		else {
-			option.ariaSelected = "false";
-			checkbox.checked = false;
-		}
-	}
-
-	function handleCourseCheckboxChange(index) {
-		const optionId = "course-" + index;
-		const checkboxId = "course-checkbox-" + index;
-		const option = document.getElementById(optionId);
-		const checkbox = document.getElementById(checkboxId);
-		if (option.ariaSelected === "false") {
-			option.ariaSelected = "true";
-			checkbox.checked = true;
-		}
-		else {
-			option.ariaSelected = "false";
-			checkbox.checked = false;
-		}
-	}
-
 	const newProps = {
 		...props, 
 		toggleDepartments: toggleDepartments,
 		toggleCourses: toggleCourses,
 		setToggleDepartments: setToggleDepartments,
 		setToggleCourses: setToggleCourses,
-		handleDepartmentCheckboxChange: handleDepartmentCheckboxChange,
-		handleCourseCheckboxChange: handleCourseCheckboxChange
-	}
 
-	// const listOfCourses = props.listOfCourses;
-		// const listOfDepartments = props.listOfDepartments;
-		// const loading = props.coursesLoading;
-		// const error = props.coursesError;
+		selectedDepartments: selectedDepartments,
+		selectedCourses: selectedCourses,
+		setSelectedDepartments: setSelectedDepartments,
+		setSelectedCourses: setSelectedCourses		
+	}
 
 	return (
 		<div className="menu-filter" id="filter">
@@ -100,8 +62,7 @@ function Filter(props) {
 			<Departments {...newProps} />
 			<Courses {...newProps} />
 			<Semesters {...newProps} />
-			<button value="Apply" onClick={handleSubmit}>Apply</button><br /><br />
-			<div id="answer"></div>
+			<button className='apply-button' value="Apply" onClick={handleSubmit}>Apply</button><br /><br />
 		</div>
 	);
 }

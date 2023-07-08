@@ -59,3 +59,21 @@
 ::-webkit-scrollbar {
 	display: none;
 }
+
+.apply-button {
+	font-family: var(--font-family);;
+	margin-left: 2px;
+	background-color: #9bc;
+	border: none;
+	outline: none;
+	width: 70px;
+	height: 30px;
+	align-items: center;
+	border-radius: 6px;
+}
+
+.apply-button:hover {
+	background-color: rgb(116, 126, 158);
+	cursor: pointer;
+	box-shadow: 2px 2px 5px, -2px -2px 5px, 2px -2px 5px, -2px 2px 5px;
+}

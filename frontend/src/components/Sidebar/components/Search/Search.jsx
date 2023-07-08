@@ -48,17 +48,6 @@ function Search(props) {
     }
 	}
 
-	// function substituteContent(course) {
-	// 	if (props.graphData === null) {
-	// 		window.alert("The server is currently down, please try again later");
-	// 		return;
-	// 	}
-	// 	const courseText = course.courseCode + ' ' + course.title;
-	// 	document.getElementById('search-bar').value = courseText;
-	// 	handleSearchSubmit(courseText);
-	// 	removeSuggestions()
-	// }
-
 	function handleFilterChoices() {
 		displaySuggestions();
 		let matchedChoices = [];

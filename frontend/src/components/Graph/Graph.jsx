@@ -6,8 +6,7 @@ import './graph.css';
 
 function Graph(props) {
 	const fgRef = props.graphRef;
-	const graphData = props.oldData;
-	// const graphData = props.graphData;
+	const graphData = props.oldData;//Change to graphData
 
 	const [displayWidth, setDisplayWidth] = useState(window.innerWidth);
 	const [displayHeight, setDisplayHeight] = useState(window.innerHeight);
@@ -24,13 +23,13 @@ function Graph(props) {
 	});
 
 	useEffect(() => {
-		if (graphData) { //change to graphData
+		if (graphData) {
 			fgRef.current
 			.d3Force('collide', forceCollide(40).strength(0.5))
 			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -30 : -200))
 			.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 20 : 100))
 		}
-	}, [graphData]); //CHange to graphData
+	}, [graphData]);
 
 	function updateHighlight() {
 		setHighlightNodes(highlightNodes);

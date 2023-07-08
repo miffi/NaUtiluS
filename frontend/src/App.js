@@ -249,6 +249,7 @@ function App() {
 	}
 	
 	return (
+		(graphData && courses && departments) &&
 		<div className='App'>
 			<Sidebar {...props} />
 			<Graph {...props} />

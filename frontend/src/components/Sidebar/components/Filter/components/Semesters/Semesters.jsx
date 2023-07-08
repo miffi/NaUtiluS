@@ -3,7 +3,7 @@ import { HiChevronUp, HiChevronDown } from "react-icons/hi"
 import './semesters.css'
 
 function Semesters() {
-	const availableChoices = ['All', 'Semester 1', 'Semester 2', 'Special Semester 1', 'Special Semester 2'];
+	const availableChoices = ['', 'Semester 1', 'Semester 2', 'Special Semester 1', 'Special Semester 2'];
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
 
 	function displaySuggestions() {
@@ -23,13 +23,16 @@ function Semesters() {
 
 	return (
 		<>
-		<label className='semesters-label'>Semesters</label><br />
+		<label className='semesters-label'>Semester</label><br />
 		<div id='semesters-container' className='semesters-container'>
-			<input id='semesters-search' className='semesters-search' type="text" placeholder='Choose semesters'
+			<input id='semesters-search' className='semesters-search' type="text" placeholder='None'
 			autoComplete='off' onBlur={removeSuggestions} readOnly={true} />
 			{ toggleSuggestions
 				? <HiChevronUp id='semesters-collapse' className='semesters-collapse' onClick={removeSuggestions} />
-				: <HiChevronDown id='semesters-expand' className='semesters-expand' onClick={displaySuggestions} />
+				: <HiChevronDown id='semesters-expand' className='semesters-expand' onClick={() => {
+					displaySuggestions();
+					document.getElementById('semesters-search').focus();
+				}} />
 			}
 		</div>
 		<div id='semesters-suggestions' className='semesters-suggestions'>

@@ -1,14 +1,15 @@
 import React, { useState } from 'react'
-import { HiChevronUp, HiChevronDown } from "react-icons/hi"
+import { HiChevronUp, HiChevronDown, HiX } from "react-icons/hi"
 import './courses.css'
 
 function Courses(props) {
-	// const listOfCourses = props.listOfCourses.map(course => course.courseCode)
-	// const handleDepartmentCheckboxChange = props.handleDepartmentCheckboxChange;
+	const delay = ms => new Promise(res => setTimeout(res, ms));
 
 	const listOfCourses = props.listOfCourses.map(course => course.courseCode);
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
+	const selected = props.selectedCourses;
+	const setSelected = props.setSelectedCourses;
 
 	function displaySuggestions() {
 		setToggleSuggestions(true);
@@ -48,29 +49,58 @@ function Courses(props) {
 		setAutoComplete(content);
 	}
 	
-	function handleCourseSubmit() {
-		return;
+	async function handleCourseSubmit(course) {
+		if (selected.includes(course)) {
+			removeSuggestions();
+			document.getElementById('courses-search').value = '';
+			document.getElementById(course + ' label').style.color = 'red';
+			await delay(1000);
+			document.getElementById(course + ' label').style.color = '#333';
+		} else {
+			removeSuggestions();
+			selected.push(course);
+			setSelected(selected);
+			document.getElementById('courses-search').blur();
+			document.getElementById('courses-search').value = '';
+		}
+	}
+
+	function deselectOption(option) {
+		setSelected(selected.filter(entry => entry !== option))
 	}
 
 	return (
-		<>
-		<label className='courses-label'>Finished Courses</label><br />
-		<div id='courses-container' className='courses-container'>
-			<input id='courses-search' className='courses-search' type="text" placeholder='Enter a course'
-			autoComplete='off' onFocus={handleFilterChoices} onBlur={removeSuggestions} onKeyUp={handleFilterChoices}/>
-			{ toggleSuggestions
-				? <HiChevronUp id='courses-collapse' className='courses-collapse' onClick={removeSuggestions} />
-				: <HiChevronDown id='courses-expand' className='courses-expand' onClick={() =>{
-					displaySuggestions();
-					document.getElementById('courses-search').focus();
-				}} />
+		<div>
+			<label className='courses-label'>Finished Courses</label><br />
+			<div id='courses-container' className='courses-container'>
+				<input id='courses-search' className='courses-search' type="text" placeholder='Enter a course'
+				autoComplete='off' onFocus={handleFilterChoices} onBlur={removeSuggestions} onKeyUp={handleFilterChoices}/>
+				{ toggleSuggestions
+					? <HiChevronUp id='courses-collapse' className='courses-collapse' onClick={removeSuggestions} />
+					: <HiChevronDown id='courses-expand' className='courses-expand' onClick={() =>{
+						displaySuggestions();
+						document.getElementById('courses-search').focus();
+					}} />
+				}
+			</div>
+			<div id='courses-suggestions' className='courses-suggestions'>
+					{autoComplete}
+			</div>
+			{ selected.length > 0 &&
+				<div id='courses-selected' className='courses-selected'>
+					{
+						selected.map(option => (
+							<div key={option} className='selected-option'>
+								<div id={option + ' label'} className='selected-label'>{option}</div>
+								<HiX className='deselect' onClick={() => deselectOption(option)}/>
+							</div>
+						))
+					}
+				</div>
 			}
+			<div id='course-warning' className='course-warning'></div>
+			<br />
 		</div>
-		<div id='courses-suggestions' className='courses-suggestions'>
-				{autoComplete}
-		</div>
-		<br />
-		</>
 
 	)
 }
