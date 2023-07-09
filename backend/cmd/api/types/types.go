@@ -5,6 +5,7 @@ type FilterOptions struct {
 	Departments []string `json:"departments,omitempty"`
 	Courses     []string `json:"courses,omitempty"`
 	Semester    string   `json:"semester,omitempty"`
+	Limit       int      `json:"limit,omitempty"`
 }
 
 type Graph struct {
@@ -72,6 +73,7 @@ type Node struct {
 	Name       string `json:"id"`
 	Department string `json:"department"`
 	IsCluster  bool   `json:"cluster"`
+	Indirect   bool   `json:"indirect"`
 }
 
 // The data of a frontend force-graph link

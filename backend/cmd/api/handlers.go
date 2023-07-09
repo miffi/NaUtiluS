@@ -26,9 +26,16 @@ func (app *application) filterPost(w http.ResponseWriter, r *http.Request) {
 	err := json.NewDecoder(r.Body).Decode(&options)
 	if err != nil {
 		app.clientError(w, http.StatusBadRequest)
+		return
 	}
-	// TODO Write actual filtering logic
-	err = app.writeJSON(w, http.StatusOK, nil, nil)
+
+	graph, err := app.dbquery.Filter(r.Context(), options)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, graph, nil)
 	if err != nil {
 		app.serverError(w, err)
 	}

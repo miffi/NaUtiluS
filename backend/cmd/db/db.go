@@ -2,6 +2,8 @@ package db
 
 import (
 	"context"
+	"fmt"
+	"strings"
 
 	"github.com/miffi/nautilus/backend/cmd/api/types"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
@@ -15,6 +17,7 @@ type DbQuery interface {
 	CourseSummaries(ctx context.Context) ([]types.Summary, error)
 	CourseDetail(ctx context.Context, code string) (types.Detail, error)
 	Departments(ctx context.Context) ([]string, error)
+	Filter(ctx context.Context, options types.FilterOptions) (types.Graph, error)
 }
 
 type DbModify interface {
@@ -460,4 +463,150 @@ func (db *database) Departments(ctx context.Context) ([]string, error) {
 
 		return names, nil
 	})
+}
+
+func buildFilterQuery(options types.FilterOptions) string {
+	hasDepartments := options.Departments != nil
+
+	departmentClause := func(writer *strings.Builder) {
+		writer.WriteString("-[:IN_DEPARTMENT]->(dep:Department")
+		if hasDepartments {
+			writer.WriteString(" WHERE dep.name IN $departments")
+		}
+		writer.WriteString(")\n")
+	}
+
+	var sb strings.Builder
+	if options.Courses != nil {
+		sb.WriteString(`UNWIND $names AS courseName
+MATCH (:Course {name: courseName})<-[:REQUIRES`)
+		if options.Limit == 1 {
+			sb.WriteRune('*')
+		} else {
+			fmt.Fprintf(&sb, "..%d", options.Limit)
+		}
+		sb.WriteString("]-(main:Main)\n")
+
+		sb.WriteString(`OPTIONAL MATCH (main)`)
+		departmentClause(&sb)
+
+		sb.WriteString(`RETURN DISTINCT main.name as name,
+	coalesce(dep.name, "") as department,
+	"Cluster" IN labels(main) as cluster,
+	coalesce($semester IN main.semester, false) AS indirect
+`)
+
+		sb.WriteString(`UNION
+UNWIND $names AS courseName
+MATCH (course:Course {name: courseName})`)
+		departmentClause(&sb)
+
+		sb.WriteString(`RETURN DISTINCT course.name AS name,
+	dep.name AS department,
+	false AS cluster,
+	NOT $semester IN course.semester AS indirect
+`)
+
+	} else if hasDepartments {
+		sb.WriteString(`MATCH (course:Course)`)
+
+		departmentClause(&sb)
+
+		sb.WriteString(`RETURN course.name AS name,
+	dep.name AS department,
+	false AS cluster,
+	NOT $semester IN course.semester AS indirect
+UNION
+MATCH (cluster:Cluster)-[:REQUIRES]-(:Course)`)
+
+		departmentClause(&sb)
+
+		sb.WriteString(`RETURN cluster.name AS name, "" AS department, true AS cluster, false AS indirect`)
+	}
+
+	return sb.String()
+}
+
+func filterNodesTxFunc(ctx context.Context, options types.FilterOptions) neo4j.ManagedTransactionWorkT[[]types.Node] {
+	return func(tx neo4j.ManagedTransaction) ([]types.Node, error) {
+		result, err := tx.Run(ctx, buildFilterQuery(options), map[string]any{
+			"names":       options.Courses,
+			"departments": options.Departments,
+			"semester":    options.Semester,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		var nodes []types.Node
+		for result.Next(ctx) {
+			value := result.Record().AsMap()
+			nodes = append(nodes, types.Node{
+				Name:       value["name"].(string),
+				Department: value["department"].(string),
+				IsCluster:  value["cluster"].(bool),
+				Indirect:   value["indirect"].(bool),
+			})
+		}
+
+		if err = result.Err(); err != nil {
+			return nil, err
+		}
+
+		return nodes, nil
+	}
+}
+
+func filterLinksTxFunc(ctx context.Context, nodeNames []string) neo4j.ManagedTransactionWorkT[[]types.Link] {
+	const query = `
+		WITH $names as names
+		MATCH (start:Main WHERE start.name IN names)-[:REQUIRES]-(end:Main WHERE end.name IN names)
+		RETURN start.name as target, end.name as source
+	`
+
+	return func(tx neo4j.ManagedTransaction) ([]types.Link, error) {
+		result, err := tx.Run(ctx, query, map[string]any{
+			"names": nodeNames,
+		})
+		if err != nil {
+			return nil, err
+		}
+
+		var links []types.Link
+		for result.Next(ctx) {
+			value := result.Record().AsMap()
+			links = append(links, types.Link{
+				SourceName: value["source"].(string),
+				TargetName: value["target"].(string),
+			})
+		}
+
+		if err = result.Err(); err != nil {
+			return nil, err
+		}
+
+		return links, nil
+	}
+}
+
+func (db *database) Filter(ctx context.Context, options types.FilterOptions) (types.Graph, error) {
+	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	nodes, err := neo4j.ExecuteRead(ctx, session, filterNodesTxFunc(ctx, options))
+	if err != nil {
+		return types.Graph{}, err
+	}
+
+	var names []string
+	for _, node := range nodes {
+		names = append(names, node.Name)
+	}
+
+	links, err := neo4j.ExecuteRead(ctx, session, filterLinksTxFunc(ctx, names))
+	if err != nil {
+		return types.Graph{}, err
+	}
+
+	return types.Graph{Nodes: nodes, Links: links}, err
 }
