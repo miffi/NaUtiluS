@@ -476,27 +476,43 @@ func buildFilterQuery(options types.FilterOptions) string {
 		writer.WriteString(")\n")
 	}
 
+	requiresClause := func(writer *strings.Builder) {
+		writer.WriteString("<-[:REQUIRES")
+		if options.Limit == 0 {
+			writer.WriteRune('*')
+		} else {
+			fmt.Fprintf(writer, "*..%d", options.Limit)
+		}
+		writer.WriteString("]-")
+	}
+
 	var sb strings.Builder
 	if options.Courses != nil {
 		sb.WriteString(`UNWIND $names AS courseName
-MATCH (:Course {name: courseName})<-[:REQUIRES`)
-		if options.Limit == 0 {
-			sb.WriteRune('*')
-		} else {
-			fmt.Fprintf(&sb, "*..%d", options.Limit)
-		}
-		sb.WriteString("]-(main:Main)\n")
-
-		sb.WriteString(`OPTIONAL MATCH (main)`)
+MATCH (:Course {name: courseName})`)
+		requiresClause(&sb)
+		sb.WriteString("(course:Course)")
 		departmentClause(&sb)
 
-		sb.WriteString(`RETURN DISTINCT main.name as name,
-	coalesce(dep.name, "") as department,
-	"Cluster" IN labels(main) as cluster,
-	coalesce($semester IN main.semester, false) AS indirect
+		sb.WriteString(`RETURN DISTINCT course.name as name,
+	dep.name as department,
+	false as cluster,
+	NOT $semester IN course.semester AS indirect
 `)
-
 		sb.WriteString(`UNION
+UNWIND $names AS courseName
+MATCH (:Course {name: courseName})`)
+		requiresClause(&sb)
+
+		sb.WriteString("(cluster:Cluster)<-[:REQUIRES*]-(:Course)")
+		departmentClause(&sb)
+		sb.WriteString(`RETURN DISTINCT cluster.name AS name,
+	"" AS department,
+	true AS cluster,
+	false AS indirect`)
+
+		sb.WriteString(`
+UNION
 UNWIND $names AS courseName
 MATCH (course:Course {name: courseName})`)
 		departmentClause(&sb)
@@ -524,6 +540,7 @@ MATCH (cluster:Cluster)-[:REQUIRES]-(:Course)`)
 		sb.WriteString(`RETURN cluster.name AS name, "" AS department, true AS cluster, false AS indirect`)
 	}
 
+	fmt.Println(sb.String())
 	return sb.String()
 }
 
