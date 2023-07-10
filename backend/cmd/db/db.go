@@ -480,10 +480,10 @@ func buildFilterQuery(options types.FilterOptions) string {
 	if options.Courses != nil {
 		sb.WriteString(`UNWIND $names AS courseName
 MATCH (:Course {name: courseName})<-[:REQUIRES`)
-		if options.Limit == 1 {
+		if options.Limit == 0 {
 			sb.WriteRune('*')
 		} else {
-			fmt.Fprintf(&sb, "..%d", options.Limit)
+			fmt.Fprintf(&sb, "*..%d", options.Limit)
 		}
 		sb.WriteString("]-(main:Main)\n")
 
@@ -524,6 +524,7 @@ MATCH (cluster:Cluster)-[:REQUIRES]-(:Course)`)
 		sb.WriteString(`RETURN cluster.name AS name, "" AS department, true AS cluster, false AS indirect`)
 	}
 
+	fmt.Println(sb.String())
 	return sb.String()
 }
 
