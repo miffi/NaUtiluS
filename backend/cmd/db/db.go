@@ -466,7 +466,7 @@ func (db *database) Departments(ctx context.Context) ([]string, error) {
 }
 
 func buildFilterQuery(options types.FilterOptions) string {
-	hasDepartments := options.Departments != nil
+	hasDepartments := options.Departments != nil && len(options.Departments) != 0
 
 	departmentClause := func(writer *strings.Builder) {
 		writer.WriteString("-[:IN_DEPARTMENT]->(dep:Department")
@@ -487,7 +487,7 @@ func buildFilterQuery(options types.FilterOptions) string {
 	}
 
 	var sb strings.Builder
-	if options.Courses != nil {
+	if options.Courses != nil && len(options.Courses) != 0 {
 		sb.WriteString(`UNWIND $names AS courseName
 MATCH (:Course {name: courseName})`)
 		requiresClause(&sb)
