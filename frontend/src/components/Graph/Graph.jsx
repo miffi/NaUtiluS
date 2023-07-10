@@ -1,12 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide, forceLink, forceManyBody } from 'd3-force-3d'
+ import { forceCollide, forceManyBody } from 'd3-force-3d'
 
 import './graph.css';
 
 function Graph(props) {
 	const fgRef = props.graphRef;
-	const graphData = props.oldData;//Change to graphData
+	const graphData = props.graphData;//Change to graphData
 
 	const [displayWidth, setDisplayWidth] = useState(window.innerWidth);
 	const [displayHeight, setDisplayHeight] = useState(window.innerHeight);
@@ -25,9 +25,8 @@ function Graph(props) {
 	useEffect(() => {
 		if (graphData) {
 			fgRef.current
-			.d3Force('collide', forceCollide(40).strength(0.5))
+			.d3Force('collide', forceCollide(25).strength(0.3))
 			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -30 : -200))
-			.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 20 : 100))
 		}
 	}, [graphData]);
 
@@ -96,17 +95,18 @@ function Graph(props) {
 		}, [hoverNode, clickNode])
 
 	// handle graph loading and error
-	// if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
-	// if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
-	return <ForceGraph2D
+	if (graphData == null) {
+		if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
+		if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
+	}
+		return <ForceGraph2D
 		ref={fgRef}
 		className='force-graph-2D'
 		graphData={graphData}
 		width={displayWidth}
 		height={displayHeight}
 		maxZoom={10}
-		cooldownTicks={100}
-		onEngineStop={() => fgRef.current.zoom(1, 400)}
+		cooldownTicks={200}
 		// nodeAutoColorBy="faculty"
 		backgroundColor='#787878'
 		nodeVal={50}
@@ -145,9 +145,9 @@ function Graph(props) {
 			setClickNode(node);
 			highlightSurroundings(node);
 			setHoverNode(null);
-			fgRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 100, 400);
+			fgRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 15, 400);
 			props.setXCoor(props.toggleFilter ? node.x - 20 : node.x);
-			props.setYCoor(node.y + 100);
+			props.setYCoor(node.y + 15);
 			node.cluster === false
 				? props.fetchCourseInfo(node)
 				: props.openDesc(false, "Not a course node");

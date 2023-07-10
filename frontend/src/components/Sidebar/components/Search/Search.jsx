@@ -3,6 +3,7 @@ import './search.css';
 import { HiChevronDown, HiChevronUp } from "react-icons/hi"
 
 function Search(props) {
+
 	const availableChoices = props.listOfCourses;
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
@@ -40,6 +41,8 @@ function Search(props) {
 					: props.openDesc(false, "Not a course node");
 		}
 		document.getElementById('search-bar').value = '';
+		document.getElementById('search-bar').blur();
+		removeSuggestions();
 	}
 
 	function handleKeyDown(key) {

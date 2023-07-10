@@ -8,8 +8,9 @@ function Courses(props) {
 	const listOfCourses = props.listOfCourses.map(course => course.courseCode);
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
-	const selected = props.selectedCourses;
-	const setSelected = props.setSelectedCourses;
+	let selected = props.selectedCourses;
+	let setSelected = props.setSelectedCourses;
+	const setToggleLimit = props.setToggleLimit
 
 	function displaySuggestions() {
 		setToggleSuggestions(true);
@@ -60,13 +61,16 @@ function Courses(props) {
 			removeSuggestions();
 			selected.push(course);
 			setSelected(selected);
+			setToggleLimit(selected.length > 0)
 			document.getElementById('courses-search').blur();
 			document.getElementById('courses-search').value = '';
 		}
 	}
 
 	function deselectOption(option) {
-		setSelected(selected.filter(entry => entry !== option))
+		const result = selected.filter(entry => entry !== option);
+		setToggleLimit(result.length > 0);
+		setSelected(result)
 	}
 
 	return (

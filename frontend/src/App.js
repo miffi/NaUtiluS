@@ -51,7 +51,7 @@ function App() {
 			minimizeFilter();
 		}
 		setToggleDesc(true);
-		document.getElementById('description').style.top = '50%';
+		document.getElementById('description').style.top = '55%';
 
 		// handle course information
 		if (isCourse === false) {
@@ -86,7 +86,7 @@ function App() {
 
 	// function to set Filter sidebar height to half when Description is open
 	function minimizeFilter() {
-		document.getElementById('filter').style.height = '50%';
+		document.getElementById('filter').style.height = '55%';
 	}
 
 	// function to return Filter sidebar to its original size
@@ -110,30 +110,32 @@ function App() {
 	const [graphData, setGraphData] = useState(null);
 	const [graphError, setGraphError] = useState(null);
 	const [graphLoading, setGraphLoading] = useState(true);
+	const initialFilter = {
+		departments: ["Computer Science"],
+		courses: ["CS1010"],
+		semester: "",
+		limit: 2
+	}
 	useEffect(() => {
-		fetch(graphURI)
-			.then(response => {
-				if (response.ok) {
-					console.log("graph data received")
-					return response.json();
-				}
-				throw response;
-			})
-			.then(data => {
-				setGraphData(data);
-				console.log(data)
-			})
-			.catch(error => {
-				console.error("Error fetching graph data: ", error);
-				setGraphError(error);
-			})
-			.finally(() => {
-				setGraphLoading(false);
-			})
-	}, [graphURI]);
+		fetch(props.filterURI, {
+			method: 'POST',
+			body: JSON.stringify(initialFilter)
+		})
+		.then(response => {
+			console.log(response.status);
+			if (!response.ok) {
+				throw new Error("HTTP status " + response.status);
+			}
+			return response.json();
+		})
+		.then(data => {
+			console.log(data);
+			props.setGraphData(data)
+		});
+	}, [])
 
 	// fetch list of courses from nusmods
-	const [courses, setCourses] = useState([])
+	const [courses, setCourses] = useState(null)
 	const [coursesError, setCoursesError] = useState(null)
 	const [coursesLoading, setCoursesLoading] = useState(true)
 	useEffect(() => {
@@ -159,7 +161,7 @@ function App() {
 	}, []);
 
 	// fetch list of departments from nusmods
-	const [departments, setDepartments] = useState([])
+	const [departments, setDepartments] = useState(null)
 	const [departmentsError, setDepartmentsError] = useState(null)
 	const [departmentsLoading, setDepartmentsLoading] = useState(true)
 	useEffect(() => {
@@ -212,7 +214,7 @@ function App() {
 		graphData: graphData,
 		error: graphError,
 		loading: graphLoading,
-		setData: setGraphData,
+		setGraphData: setGraphData,
 		setError: setGraphError,
 		setLoading: setGraphLoading,
 
@@ -249,7 +251,7 @@ function App() {
 	}
 	
 	return (
-		(graphData && courses && departments) &&
+		(courses && departments) &&
 		<div className='App'>
 			<Sidebar {...props} />
 			<Graph {...props} />
