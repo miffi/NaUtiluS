@@ -560,8 +560,8 @@ func filterNodesTxFunc(ctx context.Context, options types.FilterOptions) neo4j.M
 func filterLinksTxFunc(ctx context.Context, nodeNames []string) neo4j.ManagedTransactionWorkT[[]types.Link] {
 	const query = `
 		WITH $names as names
-		MATCH (start:Main WHERE start.name IN names)-[:REQUIRES]-(end:Main WHERE end.name IN names)
-		RETURN start.name as target, end.name as source
+		MATCH (start:Main WHERE start.name IN names)-[r:REQUIRES]-(end:Main WHERE end.name IN names)
+		RETURN startnode(r).name as target, endnode(r).name as source
 	`
 
 	return func(tx neo4j.ManagedTransaction) ([]types.Link, error) {
