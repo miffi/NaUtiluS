@@ -52,7 +52,7 @@ function Sidebar(props) {
 				<HiSearch id='search-button' title="Search" className="search-button" onClick={
 					() => {
 						if (props.toggleSearch) {
-							props.closeSearch(); /*TODO*/
+							props.closeSearch();
 							document.getElementById('search-button').style.color = '#9bc';
 						} else {
 							props.openSearch(); /*TODO*/
@@ -70,6 +70,7 @@ function Sidebar(props) {
 					}
 				} />
 			</div>
+			
 			<div className='content-container'>
 				<Filter {...props} />
 				<Description/>
