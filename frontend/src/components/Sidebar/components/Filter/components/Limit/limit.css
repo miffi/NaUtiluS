@@ -1,0 +1,19 @@
+.limit-label{
+	padding-left: 2px;
+	padding-right: 10px;
+}
+
+.limit-container {
+	align-items: center;
+}
+
+.limit-input {
+	width: 80px;
+	height: 25px;
+	margin: none;
+	padding-left: 10px;
+	border-radius: 3px;
+	border: none;
+	outline: none;
+	color: #555;
+}

@@ -1,0 +1,123 @@
+.courses-label {
+	padding-left: 2px;
+}
+
+.courses-container {
+	width: 250px;
+	padding: none;
+	margin: 7px 0px 2px 3px;
+	padding: 0;
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+}
+
+.courses-search {
+	flex: 1;
+	font-size: 12px;
+	width: 100%;
+	height: 30px;
+	margin: none;
+	padding-left: 10px;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	border: none;
+	outline: none;
+	color: #555;
+}
+
+.courses-expand,
+.courses-collapse {
+	background-color: white;
+	color: #555;
+	width: 30px;
+	height: 32px;
+	padding: none;
+	margin: none;
+	border-width: 0;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.courses-expand:hover,
+.courses-collapse:hover {
+	cursor: pointer;
+	background-color: grey;
+	color: white;
+}
+
+.courses-suggestions {
+	width: 250px;
+	max-height: 300px;
+	margin: 0px 0px 10px 3px;
+	border-radius: 3px;
+	background-color: #f8f7f7;
+	color: #555;
+	font-size: 12px;
+	overflow-y: auto;
+	z-index: 3;
+	position: absolute;
+}
+
+.courses-suggestions ul {
+	padding-left: 5px;
+	padding-right: 5px;
+	margin-block-start: 5px;
+	margin-block-end: 5px;
+}
+
+.courses-suggestions ul li {
+	list-style: none;
+	border-radius: 3px;
+	padding-top: 5px;
+	padding-bottom: 6px;
+	padding-left: 6px;
+	cursor: pointer;
+}
+
+.courses-suggestions ul .courses-choices:hover {
+	background: #e9f3ff;
+}
+
+.courses-selected {
+	background-color: rgb(220, 220, 220);
+	margin: 0px 0px 10px 3px;
+	padding: 5px 10px;
+	width: 230px;
+	border-radius: 3px;
+	color: black;
+	font-size: 12px;
+	align-items: center;
+}
+
+.courses-selected .selected-option {
+	background-color: #99cccc;
+	width: fit-content;
+	height: fit-content;
+	padding: 3px 6px;
+	margin: 3px 0px;
+	border-radius: 3px;
+	display: flex;
+	align-items: center;
+}
+
+.selected-label {
+	color: #333;
+	padding-right: 10px;
+}
+
+.deselect {
+	color: #333;
+	width: 10px;
+	height: 16px;
+	padding: none;
+	margin: none;
+	border-width: 0;
+	cursor: pointer;
+}
+
+.course-warning {
+	padding-left: 2px;
+	font-size: small;
+	color: rgb(255, 99, 99);
+}

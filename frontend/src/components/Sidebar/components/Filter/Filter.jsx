@@ -1,134 +1,81 @@
-import React from 'react';
+import React, { useState } from 'react';
 import './filter.css';
+import Departments from './components/Departments/Departments';
+import Courses from './components/Courses/Courses';
+import Semesters from './components/Semesters/Semesters';
+import Limit from './components/Limit/Limit';
 
 function Filter(props) {
-	function Form() {
+	const [toggleDepartments, setToggleDepartments] = useState(false);
+	const [toggleCourses, setToggleCourses] = useState(false);
+	const [selectedDepartments, setSelectedDepartments] = useState(['Computer Science'])
+	const [selectedCourses, setSelectedCourses] = useState(['CS1010'])
+	const [toggleLimit, setToggleLimit] = useState(true);
 
-		const listOfCourses = props.listOfCourses;
-		const listOfDepartments = props.listOfDepartments;
-		const loading = props.coursesLoading;
-		const error = props.coursesError;
+	function handleSubmit() {
+		const semester = document.getElementById('semesters-search').value;
+		const limitVal = selectedCourses.length > 0 ? document.getElementById('limit-input').value : 0;
+		const limit = limitVal ? parseInt(limitVal) : 0;
 
-		function handleSubmit() {
-			let departments = document.getElementsByClassName("department-item");
-			let courses = document.getElementsByClassName("course-item");
-			let semester = document.getElementById("semester_dropdown").value;
-
-			let selectedDepartments = [...departments]
-				.filter(option => option.ariaSelected === "true")
-				.map(option => option.ariaLabel);
-			let selectedCourses = [...courses]
-				.filter(option => option.ariaSelected === "true")
-				.map(option => option.ariaLabel);
-
-			const filterObject = {
-				department: selectedDepartments,
-				courses: selectedCourses,
-				semester: semester
-			}
-			let filterQuery = JSON.stringify(filterObject);
-
-			console.log(filterQuery);
-			sendData(filterQuery);
+		if (selectedCourses.length === 0 && selectedDepartments.length === 0) {
+			window.alert('Please specify a filter!');
+			return;
 		}
 
-		async function sendData(data) {
-			await fetch(props.filterURI, {
-				method: 'POST',
-				body: data
-			})
-				.then(response => {
-					console.log(response.status);
-					if (!response.ok) {
-						throw new Error("HTTP status " + response.status);
-					}
-					
-					console.log(response.clone().json());
-					return response.json();
-				}
-
-				);
+		const filterObject = {
+			departments: selectedDepartments,
+			courses: selectedCourses,
+			semester: semester,
+			limit: limit
 		}
+		let filterQuery = JSON.stringify(filterObject);
 
-		function handleDepartmentCheckboxChange(index) {
-			const optionId = "department-" + index;
-			const checkboxId = "department-checkbox-" + index;
-			const option = document.getElementById(optionId);
-			const checkbox = document.getElementById(checkboxId);
-			if (option.ariaSelected === "false") {
-				option.ariaSelected = "true";
-				checkbox.checked = true;
-			}
-			else {
-				option.ariaSelected = "false";
-				checkbox.checked = false;
-			}
-		}
+		console.log(filterQuery);
+		sendData(filterQuery);
+	}
 
-		function handleCourseCheckboxChange(index) {
-			const optionId = "course-" + index;
-			const checkboxId = "course-checkbox-" + index;
-			const option = document.getElementById(optionId);
-			const checkbox = document.getElementById(checkboxId);
-			if (option.ariaSelected === "false") {
-				option.ariaSelected = "true";
-				checkbox.checked = true;
+	async function sendData(data) {
+		await fetch(props.filterURI, {
+			method: 'POST',
+			body: data
+		})
+		.then(response => {
+			console.log(response.status);
+			if (!response.ok) {
+				throw new Error("HTTP status " + response.status);
 			}
-			else {
-				option.ariaSelected = "false";
-				checkbox.checked = false;
-			}
-		}
+			return response.json();
+		})
+		.then(data => {
+			console.log(data);
+			if (!data.nodes || !data.links) window.alert('No courses fit this description!')
+			else props.setGraphData(data)
+		});
+	}
 
-		return (
-			<div className="filter-form" id="filter_form">
-				<label htmlFor='department_dropdown' style={{ paddingLeft: 2 + 'px' }}>Department</label><br />
-				<div role="listbox" tabIndex={0} id="department_dropdown" className="department-dropdown" aria-multiselectable="true">
-					{listOfDepartments.map((element, index) => (
-						<div
-							id={"department-" + index} key={"department-" + index} className="department-item" role="option" aria-selected="false"
-							aria-label={element} onClick={() => handleDepartmentCheckboxChange(index)}>
-							<input id={"department-checkbox-" + index} className="department-checkbox" tabIndex={-1} type='checkbox'></input>
-							<label className="department-label">{element}</label>
-						</div>
-					))}
-				</div><br />
-				<label htmlFor="done_courses" style={{ paddingLeft: 2 + 'px' }}>Courses Finished</label><br />
-				<div role="listbox" tabIndex={0} id="course_dropdown" className="course-dropdown" aria-multiselectable="true">
-					{
-					error
-					? <div type='text'>Cannot fetch course data</div>
-					: loading
-					? <div type='text'>Fetching course data</div>
-					: 
-					listOfCourses.map((element, index) => (
-						<div
-							id={"course-" + index} key={"course-" + index} className="course-item" role="option" aria-selected="false"
-							aria-label={element} onClick={() => handleCourseCheckboxChange(index)}>
-							<input id={"course-checkbox-" + index} className="course-checkbox" tabIndex={-1} type='checkbox'></input>
-							<label className="course-label">{element}</label>
-						</div>
-						))
-					}
-				</div><br />
-				<label htmlFor='semester_dropdown' style={{ paddingLeft: 2 + 'px' }}>Semester</label><br />
-				<select name="semester" id="semester_dropdown" className="semester-dropdown">
-					<option value="none"></option>
-					<option value="Sem1">Semester 1</option>
-					<option value="Sem2">Semester 2</option>
-					<option value="SpSem1">Special Semester 1</option>
-					<option value="SpSem2">Special Semester 2</option>
-				</select><br /><br />
-				<button value="Apply" onClick={handleSubmit}>Apply</button><br /><br />
-			</div>
-		);
+	const newProps = {
+		...props, 
+		toggleDepartments: toggleDepartments,
+		toggleCourses: toggleCourses,
+		toggleLimit: toggleLimit,
+		setToggleDepartments: setToggleDepartments,
+		setToggleCourses: setToggleCourses,
+		setToggleLimit: setToggleLimit,
+
+		selectedDepartments: selectedDepartments,
+		selectedCourses: selectedCourses,
+		setSelectedDepartments: setSelectedDepartments,
+		setSelectedCourses: setSelectedCourses		
 	}
 
 	return (
 		<div className="menu-filter" id="filter">
 			<h1>Filter</h1>
-			<Form />
-			<div id="answer"></div>
+			<Departments {...newProps} />
+			<Courses {...newProps} />
+			{toggleLimit && <Limit />}
+			<Semesters {...newProps} />
+			<button className='apply-button' value="Apply" onClick={handleSubmit}>Apply</button><br /><br />
 		</div>
 	);
 }
