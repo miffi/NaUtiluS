@@ -33,10 +33,8 @@ function Sidebar(props) {
 					() => {
 						if (props.toggleDesc) {
 							props.closeDesc();
-							document.getElementById('description-button').style.color = '#9bc';
 						} else {
 							props.openDesc(false, "Click on a node to view course information");
-							document.getElementById('description-button').style.color = '#eee';
 						}
 					}
 				} onMouseEnter={

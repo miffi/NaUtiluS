@@ -12,6 +12,7 @@ function App() {
 	const filterURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/filter.json'
 	const courseSummaryURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/courseSummary.json'
 	const departmentsURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/departments.json'
+	const expandNodeURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/expandNode.json"
 
 	// variables to handle toggle of Filter and Description sidebars
 	const [toggleFilter, setToggleFilter] = useState(false)
@@ -42,6 +43,7 @@ function App() {
 	function closeDesc() {
 		maximizeFilter();
 		setToggleDesc(false);
+		document.getElementById('description-button').style.color = '#9bc';
 		document.getElementById('description').style.top = '100%';
 	}
 
@@ -51,6 +53,7 @@ function App() {
 			minimizeFilter();
 		}
 		setToggleDesc(true);
+		document.getElementById('description-button').style.color = '#eee'
 		document.getElementById('description').style.top = '55%';
 
 		// handle course information
@@ -62,6 +65,7 @@ function App() {
 		} else {
 			const title = content.courseCode + " " + content.title
 			const description = content.description;
+			const semesters = content.semesters.join(', ')
 			// const semesters = content.semesterData
 			// 	.map(sem => sem.semester === 1 || sem.semester === 2
 			// 			? "Semester " + sem.semester
@@ -79,7 +83,7 @@ function App() {
 			document.getElementById('description_placeholder').style.display = "none";
 			document.getElementById('description_content').style.display = "block";
 			document.getElementById('course_info').innerHTML = description;
-			// document.getElementById('semester_content').innerHTML = semesters;
+			document.getElementById('semester_content').innerHTML = semesters;
 			document.getElementById('prereq_content').innerHTML = prereqs;
 		}
 	}
@@ -110,19 +114,22 @@ function App() {
 	const [graphData, setGraphData] = useState(null);
 	const [graphError, setGraphError] = useState(null);
 	const [graphLoading, setGraphLoading] = useState(true);
+	const [nodeSet, updateNodeSet] = useState(new Set())
+	const [linkSet, updateLinkSet] = useState(new Set())
 	const initialFilter = {
 		departments: ["Computer Science"],
 		courses: ["CS1010"],
 		semester: "",
 		limit: 2
 	}
+
 	useEffect(() => {
 		fetch(props.filterURI, {
 			method: 'POST',
 			body: JSON.stringify(initialFilter)
 		})
 		.then(response => {
-			console.log(response.status);
+			console.log("filter data received, status: " + response.status);
 			if (!response.ok) {
 				throw new Error("HTTP status " + response.status);
 			}
@@ -130,6 +137,18 @@ function App() {
 		})
 		.then(data => {
 			console.log(data);
+			updateNodeSet(prevNodeSet => {
+				prevNodeSet.clear();
+				data.nodes.forEach(node => prevNodeSet.add(node.id));
+				console.log(prevNodeSet);
+				return prevNodeSet;
+			})
+			updateLinkSet(prevLinkSet => {
+				prevLinkSet.clear();
+				data.links.forEach(link => prevLinkSet.add(JSON.stringify(link)));
+				console.log(prevLinkSet);
+				return prevLinkSet;
+			})
 			props.setGraphData(data)
 		});
 	}, [])
@@ -149,7 +168,7 @@ function App() {
 			})
 			.then(data => {
 				setCourses(data);
-				console.log(data);
+				// console.log(data);
 			})
 			.catch(error => {
 				console.error("Error fetching courses list data: ", error);
@@ -175,7 +194,7 @@ function App() {
 			})
 			.then(data => {
 				setDepartments(data);
-				console.log(data);
+				// console.log(data);
 			})
 			.catch(error => {
 				console.error("Error fetching departments list data: ", error);
@@ -197,7 +216,7 @@ function App() {
 				throw response;
 			})
 			.then(data => {
-				console.log(data);
+				// console.log(data);
 				openDesc(true, data)
 			})
 			.catch(error => {
@@ -205,11 +224,60 @@ function App() {
 			})
 	}
 
-// pass on variables to props for other components  
+	// highlight nodes
+	const [hoverNode, setHoverNode] = useState(null);
+	const [clickNode, setClickNode] = useState(null);
+	const [highlightLinks, setHighlightLinks] = useState(new Set());
+	const [highlightNodes, setHighlightNodes] = useState(new Set());
+
+	function handleSingleClick(node) {
+		setClickNode(node);
+		highlightSurroundings(node);
+		setHoverNode(null);
+		graphRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 15, 400);
+		props.setXCoor(props.toggleFilter ? node.x - 20 : node.x);
+		props.setYCoor(node.y + 15);
+		node.cluster === false
+			? props.fetchCourseInfo(node)
+			: props.openDesc(false, "Not a course node");
+	}
+
+	function highlightSurroundings(node) {
+		highlightNodes.clear();
+		highlightLinks.clear();
+		
+		if (node) {
+			setClickNode(node);
+			props.graphData.links
+				.filter(link => link.target === node)
+				.forEach(link => {
+					highlightLinks.add(link)
+					highlightNodes.add(link.source)
+					if (link.source.cluster)  {
+						const cluster = link.source
+						props.graphData.links
+							.filter(link => link.target === cluster)
+							.forEach(link => {
+								highlightLinks.add(link);
+								highlightNodes.add(link.source);
+							})
+					}
+				});
+		}
+		updateHighlight();
+	}
+
+	function updateHighlight() {
+		setHighlightNodes(highlightNodes);
+		setHighlightLinks(highlightLinks);
+	}
+
+	// pass on variables to props for other components  
 	let props = {
 		oldData: oldData,
 		graphURI: graphURI,
 		filterURI: filterURI,
+		expandNodeURI: expandNodeURI,
 
 		graphData: graphData,
 		error: graphError,
@@ -217,6 +285,11 @@ function App() {
 		setGraphData: setGraphData,
 		setError: setGraphError,
 		setLoading: setGraphLoading,
+		
+		nodeSet: nodeSet,
+		linkSet : linkSet,
+		updateNodeSet: updateNodeSet,
+		updateLinkSet: updateLinkSet,
 
 		fetchCourseInfo: fetchCourseInfo,
 
@@ -247,8 +320,24 @@ function App() {
 		xCoor: xCoor,
 		yCoor: yCoor,
 		setYCoor: setYCoor,
-		setXCoor: setXCoor
+		setXCoor: setXCoor,
+
+		hoverNode: hoverNode,
+		clickNode: clickNode,
+		highlightLinks: highlightLinks,
+		highlightNodes: highlightNodes,
+		setHoverNode: setHoverNode,
+		setClickNode: setClickNode,
+		setHighlightLinks: setHighlightLinks,
+		setHighlightNodes: setHighlightNodes,
+
+		handleSingleClick: handleSingleClick,
+		highlightSurroundings: highlightSurroundings,
+		updateHighlight: updateHighlight
 	}
+
+	//check graphData
+	useEffect(() => console.log(graphData), [graphData])
 	
 	return (
 		(courses && departments) &&
