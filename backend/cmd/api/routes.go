@@ -17,6 +17,7 @@ func (app *application) routes() http.Handler {
 	// doesn't seem to handle that. It's handled manually.
 	router.HandlerFunc(http.MethodGet, "/v1/course/:code", app.courseDetail)
 	router.HandlerFunc(http.MethodGet, "/v1/departments.json", app.departments)
+	router.HandlerFunc(http.MethodPost, "/v1/expandNode.json", app.expandNode)
 
 	return app.recoverPanic(app.enableCORS(router))
 }

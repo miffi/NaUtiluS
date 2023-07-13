@@ -13,6 +13,46 @@ type Graph struct {
 	Links []Link `json:"links"`
 }
 
+// The data of a frontend force-graph node
+type Node struct {
+	Name       string `json:"id"`
+	Department string `json:"department"`
+	IsCluster  bool   `json:"cluster"`
+	Indirect   bool   `json:"indirect"`
+}
+
+// The data of a frontend force-graph link
+type Link struct {
+	SourceName string `json:"source"`
+	TargetName string `json:"target"`
+}
+
+type Detail struct {
+	Preclusion   string `json:"preclusion"`
+	Prerequisite string `json:"prerequisite"`
+
+	Description string `json:"description"`
+
+	Title      string `json:"title"`
+	Department string `json:"department"`
+	Faculty    string `json:"faculty"`
+
+	Code   string `json:"courseCode"`
+	Credit string `json:"credit"`
+
+	Semesters []string `json:"semesters"`
+}
+
+type Summary struct {
+	Code  string `json:"courseCode"`
+	Title string `json:"title"`
+}
+
+type NodeNeighbors struct {
+	Name      string   `json:"name"`
+	Neighbors []string `json:"neighbors"`
+}
+
 // Type holding all the information for one course.
 // The json tags correspond to their names in the NUSMods API.
 type CourseDetails struct {
@@ -45,39 +85,4 @@ type CourseSummary struct {
 	Code      string `json:"moduleCode"`
 	Title     string `json:"title"`
 	Semesters []int  `json:"semesters"`
-}
-
-type Summary struct {
-	Code  string `json:"courseCode"`
-	Title string `json:"title"`
-}
-
-type Detail struct {
-	Preclusion   string `json:"preclusion"`
-	Prerequisite string `json:"prerequisite"`
-
-	Description string `json:"description"`
-
-	Title      string `json:"title"`
-	Department string `json:"department"`
-	Faculty    string `json:"faculty"`
-
-	Code   string `json:"courseCode"`
-	Credit string `json:"credit"`
-
-	Semesters []string `json:"semesters"`
-}
-
-// The data of a frontend force-graph node
-type Node struct {
-	Name       string `json:"id"`
-	Department string `json:"department"`
-	IsCluster  bool   `json:"cluster"`
-	Indirect   bool   `json:"indirect"`
-}
-
-// The data of a frontend force-graph link
-type Link struct {
-	SourceName string `json:"source"`
-	TargetName string `json:"target"`
 }

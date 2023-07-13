@@ -16,6 +16,7 @@ type DbQuery interface {
 	CourseDetail(ctx context.Context, code string) (types.Detail, error)
 	Departments(ctx context.Context) ([]string, error)
 	Filter(ctx context.Context, options types.FilterOptions) (types.Graph, error)
+	ExpandNode(ctx context.Context, neighbors types.NodeNeighbors) (types.Graph, error)
 }
 
 type DbModify interface {
@@ -461,4 +462,56 @@ func (db *database) Departments(ctx context.Context) ([]string, error) {
 
 		return names, nil
 	})
+}
+
+func (db *database) ExpandNode(ctx context.Context, neighbors types.NodeNeighbors) (types.Graph, error) {
+	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
+	defer session.Close(ctx)
+
+	return neo4j.ExecuteRead(ctx, session, findNeighborsTxFunc(ctx, neighbors))
+}
+
+func findNeighborsTxFunc(ctx context.Context, neighbors types.NodeNeighbors) neo4j.ManagedTransactionWorkT[types.Graph] {
+	return func(tx neo4j.ManagedTransaction) (types.Graph, error) {
+		const query = `
+			MATCH (:Course {name: $name})-[r:REQUIRES]-(cluster:Cluster)
+			WHERE NOT cluster.name IN $neighbors
+			RETURN startNode(r).name AS target, endNode(r).name AS source, cluster.name AS name, "" AS department, true AS cluster, false AS indirect
+			UNION
+			MATCH (:Course {name: $name})-[r:REQUIRES]-(course:Course)-[:IN_DEPARTMENT]->(dep:Department)
+			WHERE NOT course.name IN $neighbors
+			RETURN startNode(r).name AS target, endNode(r).name AS source, course.name AS name, dep.name AS department, false AS cluster, false AS indirect
+		`
+
+		result, err := tx.Run(ctx, query, map[string]any{
+			"name":      neighbors.Name,
+			"neighbors": neighbors.Neighbors,
+		})
+		if err != nil {
+			return types.Graph{}, err
+		}
+
+		graph := types.Graph{}
+		for result.Next(ctx) {
+			value := result.Record().AsMap()
+
+			graph.Links = append(graph.Links, types.Link{
+				SourceName: value["source"].(string),
+				TargetName: value["target"].(string),
+			})
+
+			graph.Nodes = append(graph.Nodes, types.Node{
+				Name:       value["name"].(string),
+				Department: value["department"].(string),
+				IsCluster:  value["cluster"].(bool),
+				Indirect:   value["indirect"].(bool),
+			})
+		}
+
+		if err = result.Err(); err != nil {
+			return types.Graph{}, err
+		}
+
+		return graph, nil
+	}
 }
