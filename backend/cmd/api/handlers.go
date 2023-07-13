@@ -81,3 +81,23 @@ func (app *application) departments(w http.ResponseWriter, r *http.Request) {
 		app.serverError(w, err)
 	}
 }
+
+func (app *application) expandNode(w http.ResponseWriter, r *http.Request) {
+	var neighbors types.NodeNeighbors
+	err := json.NewDecoder(r.Body).Decode(&neighbors)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	diff, err := app.dbquery.ExpandNode(r.Context(), neighbors)
+	if err != nil {
+		app.serverError(w, err)
+		return
+	}
+
+	err = app.writeJSON(w, http.StatusOK, diff, nil)
+	if err != nil {
+		app.serverError(w, err)
+	}
+}
