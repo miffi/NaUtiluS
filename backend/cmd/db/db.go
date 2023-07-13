@@ -474,11 +474,11 @@ func (db *database) ExpandNode(ctx context.Context, neighbors types.NodeNeighbor
 func findNeighborsTxFunc(ctx context.Context, neighbors types.NodeNeighbors) neo4j.ManagedTransactionWorkT[types.Graph] {
 	return func(tx neo4j.ManagedTransaction) (types.Graph, error) {
 		const query = `
-			MATCH (:Course {name: $name})-[r:REQUIRES]-(cluster:Cluster)
+			MATCH (:Main {name: $name})-[r:REQUIRES]-(cluster:Cluster)
 			WHERE NOT cluster.name IN $neighbors
 			RETURN startNode(r).name AS target, endNode(r).name AS source, cluster.name AS name, "" AS department, true AS cluster, false AS indirect
 			UNION
-			MATCH (:Course {name: $name})-[r:REQUIRES]-(course:Course)-[:IN_DEPARTMENT]->(dep:Department)
+			MATCH (:Main {name: $name})-[r:REQUIRES]-(course:Course)-[:IN_DEPARTMENT]->(dep:Department)
 			WHERE NOT course.name IN $neighbors
 			RETURN startNode(r).name AS target, endNode(r).name AS source, course.name AS name, dep.name AS department, false AS cluster, false AS indirect
 		`
