@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide, forceManyBody } from 'd3-force-3d'
+import { forceCollide, forceManyBody, forceLink} from 'd3-force-3d'
 // import debounce from 'lodash.debounce'
 
 import './graph.css';
@@ -31,8 +31,9 @@ function Graph(props) {
 	useEffect(() => {
 		if (props.graphData) {
 			fgRef.current
+			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -10 : -100))
+			.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 40 : link.source.cluster === true ? 70 : 50))
 			.d3Force('collide', forceCollide(30).strength(0.3))
-			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? 50 : -100))
 		}
 	}, [props.graphData]);
 
@@ -48,12 +49,12 @@ function Graph(props) {
 			return response.json();
 		})
 		.then(data => {
-			console.log(props.graphData)
-			console.log('sets before:')
-			console.log(nodeSet)
-			console.log(linkSet)
-			console.log('data received from expandNode.json:')
-			console.log(data)
+			// console.log(props.graphData)
+			// console.log('sets before:')
+			// console.log(nodeSet)
+			// console.log(linkSet)
+			// console.log('data received from expandNode.json:')
+			// console.log(data)
 			const expandNodes = data.nodes;
 			const expandLinks = data.links;
 			const newNodes = [];
@@ -62,8 +63,8 @@ function Graph(props) {
 			expandNodes.forEach(node => {
 				if (!nodeSet.has(node.id)) {
 					nodeSet.add(node.id);
-					console.log('nodeSet updated: Added ' + node.id)
-					console.log(nodeSet)
+					// console.log('nodeSet updated: Added ' + node.id)
+					// console.log(nodeSet)
 					newNodes.push(node);
 				}
 			})
@@ -71,24 +72,24 @@ function Graph(props) {
 			expandLinks.forEach(link => {
 				if (!linkSet.has(JSON.stringify(link))) {
 					linkSet.add(JSON.stringify(link))
-					console.log('linkSet updated: Added ' + link)
-					console.log(linkSet)
+					// console.log('linkSet updated: Added ' + link)
+					// console.log(linkSet)
 					newLinks.push(link)
 				}
 			})
 			updateLinkSet(linkSet);
-			console.log('nodes and links to be added:' + JSON.stringify(newNodes))
-			console.log(newNodes);
-			console.log(newLinks)
+			// console.log('nodes and links to be added:' + JSON.stringify(newNodes))
+			// console.log(newNodes);
+			// console.log(newLinks)
 			props.setGraphData(({nodes, links}) => {
 				return {
 					nodes: [...nodes, ...newNodes],
 					links: [...links, ...newLinks]
 				};
 			});
-			console.log('sets after')
-			console.log(nodeSet);
-			console.log(linkSet)
+			// console.log('sets after')
+			// console.log(nodeSet);
+			// console.log(linkSet)
 		})
 	}
 
@@ -194,11 +195,11 @@ function Graph(props) {
 			}
 		}
 		onNodeClick={node => {
-			console.log('Single click');
+			// console.log('Single click');
 			props.handleSingleClick(node);
 		}}
 		onNodeRightClick={ node =>{
-			console.log('Right click')
+			// console.log('Right click')
 			handleRightClick(node)
 		}}
 		onNodeHover={node => {

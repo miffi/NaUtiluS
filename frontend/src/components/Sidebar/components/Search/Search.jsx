@@ -19,12 +19,12 @@ function Search(props) {
 	}
 
 	function handleSearchSubmit(courseName) {
-		console.log(props.graphData)
+		// console.log(props.graphData)
 		if (props.graphData === null) {
 			window.alert("The server is currently down, please try again later");
 			return;
 		}
-		console.log(courseName);
+		// console.log(courseName);
 		const node = props.graphData.nodes.filter(node => node.id === courseName)
 		if (node[0] === undefined) {
 			props.openDesc(false, "Course not found!");
