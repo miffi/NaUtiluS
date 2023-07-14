@@ -49,7 +49,21 @@ function Filter(props) {
 		.then(data => {
 			console.log(data);
 			if (!data.nodes || !data.links) window.alert('No courses fit this description!')
-			else props.setGraphData(data)
+			else {
+				props.updateNodeSet(prevNodeSet => {
+					prevNodeSet.clear();
+					data.nodes.forEach(node => prevNodeSet.add(node.id));
+					console.log(prevNodeSet);
+					return prevNodeSet;
+				})
+				props.updateLinkSet(prevLinkSet => {
+					prevLinkSet.clear();
+					data.links.forEach(link => prevLinkSet.add(JSON.stringify(link)));
+					console.log(prevLinkSet);
+					return prevLinkSet;
+				})
+				props.setGraphData(() => data)
+			}
 		});
 	}
 

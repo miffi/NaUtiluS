@@ -18,12 +18,12 @@ function Search(props) {
 		document.getElementById('search-suggestions').style.display = 'none';
 	}
 
-	function handleSearchSubmit() {
+	function handleSearchSubmit(courseName) {
+		console.log(props.graphData)
 		if (props.graphData === null) {
 			window.alert("The server is currently down, please try again later");
 			return;
 		}
-		const courseName = document.getElementById('search-bar').value.split(' ')[0];
 		console.log(courseName);
 		const node = props.graphData.nodes.filter(node => node.id === courseName)
 		if (node[0] === undefined) {
@@ -31,14 +31,7 @@ function Search(props) {
 		}
 		else {
 			const courseData = node[0]
-			console.log(courseData)
-			props.graphRef.current.centerAt(props.toggleFilter ? courseData.x - 20 : courseData.x, courseData.y + 14, 400);
-			props.setXCoor(props.toggleFilter ? courseData.x - 20 : courseData.x);
-			props.setYCoor(courseData.y + 14);
-			props.graphRef.current.zoom(7, 400);
-			courseData.cluster === false
-					? props.fetchCourseInfo(courseData)
-					: props.openDesc(false, "Not a course node");
+			props.handleSingleClick(courseData)
 		}
 		document.getElementById('search-bar').value = '';
 		document.getElementById('search-bar').blur();
@@ -47,7 +40,8 @@ function Search(props) {
 
 	function handleKeyDown(key) {
 		if(key.keyCode === 13) {
-      handleSearchSubmit();
+			const courseName = document.getElementById('search-bar').value.split(' ')[0];
+      handleSearchSubmit(courseName);
     }
 	}
 
@@ -77,7 +71,7 @@ function Search(props) {
 					const courseText = course.courseCode + ' ' + course.title
 					const courseCode = course.courseCode;
 					return <li key={courseCode} className={'course-choices'}
-						onClick={() => handleSearchSubmit(courseText)} onMouseDown={() => event.preventDefault()}>{courseText}</li>;
+						onClick={() => handleSearchSubmit(courseCode)} onMouseDown={() => event.preventDefault()}>{courseText}</li>;
 				})}
 			</ul>
 		}
