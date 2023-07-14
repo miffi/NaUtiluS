@@ -63,6 +63,8 @@ function Filter(props) {
 					return prevLinkSet;
 				})
 				props.setGraphData(() => data)
+				props.graphRef.current.zoom(1.7, 200)
+				props.graphRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 200);
 			}
 		});
 	}
