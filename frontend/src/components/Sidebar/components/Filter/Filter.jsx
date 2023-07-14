@@ -30,7 +30,7 @@ function Filter(props) {
 		}
 		let filterQuery = JSON.stringify(filterObject);
 
-		console.log(filterQuery);
+		// console.log(filterQuery);
 		sendData(filterQuery);
 	}
 
@@ -40,26 +40,26 @@ function Filter(props) {
 			body: data
 		})
 		.then(response => {
-			console.log(response.status);
+			// console.log(response.status);
 			if (!response.ok) {
 				throw new Error("HTTP status " + response.status);
 			}
 			return response.json();
 		})
 		.then(data => {
-			console.log(data);
+			// console.log(data);
 			if (!data.nodes || !data.links) window.alert('No courses fit this description!')
 			else {
 				props.updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
-					console.log(prevNodeSet);
+					// console.log(prevNodeSet);
 					return prevNodeSet;
 				})
 				props.updateLinkSet(prevLinkSet => {
 					prevLinkSet.clear();
 					data.links.forEach(link => prevLinkSet.add(JSON.stringify(link)));
-					console.log(prevLinkSet);
+					// console.log(prevLinkSet);
 					return prevLinkSet;
 				})
 				props.setGraphData(() => data)

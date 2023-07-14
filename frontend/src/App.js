@@ -129,24 +129,24 @@ function App() {
 			body: JSON.stringify(initialFilter)
 		})
 		.then(response => {
-			console.log("filter data received, status: " + response.status);
+			// console.log("filter data received, status: " + response.status);
 			if (!response.ok) {
 				throw new Error("HTTP status " + response.status);
 			}
 			return response.json();
 		})
 		.then(data => {
-			console.log(data);
+			// console.log(data);
 			updateNodeSet(prevNodeSet => {
 				prevNodeSet.clear();
 				data.nodes.forEach(node => prevNodeSet.add(node.id));
-				console.log(prevNodeSet);
+				// console.log(prevNodeSet);
 				return prevNodeSet;
 			})
 			updateLinkSet(prevLinkSet => {
 				prevLinkSet.clear();
 				data.links.forEach(link => prevLinkSet.add(JSON.stringify(link)));
-				console.log(prevLinkSet);
+				// console.log(prevLinkSet);
 				return prevLinkSet;
 			})
 			props.setGraphData(data)
@@ -161,14 +161,14 @@ function App() {
 		fetch(courseSummaryURI)
 			.then(response => {
 				if (response.ok) {
-					console.log("course data received");
+					// console.log("course data received");
 					return response.json();
 				}
 				throw response;
 			})
 			.then(data => {
 				setCourses(data);
-				// console.log(data);
+				// // console.log(data);
 			})
 			.catch(error => {
 				console.error("Error fetching courses list data: ", error);
@@ -187,14 +187,14 @@ function App() {
 		fetch(departmentsURI)
 			.then(response => {
 				if (response.ok) {
-					console.log("departments data received");
+					// console.log("departments data received");
 					return response.json();
 				}
 				throw response;
 			})
 			.then(data => {
 				setDepartments(data);
-				// console.log(data);
+				// // console.log(data);
 			})
 			.catch(error => {
 				console.error("Error fetching departments list data: ", error);
@@ -216,7 +216,7 @@ function App() {
 				throw response;
 			})
 			.then(data => {
-				// console.log(data);
+				// // console.log(data);
 				openDesc(true, data)
 			})
 			.catch(error => {
@@ -234,9 +234,9 @@ function App() {
 		setClickNode(node);
 		highlightSurroundings(node);
 		setHoverNode(null);
-		graphRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 15, 400);
+		graphRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 100, 400);
 		props.setXCoor(props.toggleFilter ? node.x - 20 : node.x);
-		props.setYCoor(node.y + 15);
+		props.setYCoor(node.y + 100);
 		node.cluster === false
 			? props.fetchCourseInfo(node)
 			: props.openDesc(false, "Not a course node");
@@ -337,7 +337,7 @@ function App() {
 	}
 
 	//check graphData
-	useEffect(() => console.log(graphData), [graphData])
+	// useEffect(() => console.log(graphData), [graphData])
 	
 	return (
 		(courses && departments) &&

@@ -71,7 +71,7 @@ function Courses(props) {
 		const result = selected.filter(entry => entry !== option);
 		setToggleLimit(result.length > 0);
 		setSelected(result)
-		console.log(result)
+		// console.log(result)
 	}
 
 	return (
