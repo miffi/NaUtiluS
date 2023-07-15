@@ -1,4 +1,4 @@
-import React, { useCallback, /*useEffect, */ useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
 import { forceCollide } from 'd3-force-3d'
 
