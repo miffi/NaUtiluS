@@ -18,6 +18,7 @@ function App() {
 	const [toggleFilter, setToggleFilter] = useState(false)
 	const [toggleDesc, setToggleDesc] = useState(false)
 	const [toggleSearch, setToggleSearch] = useState(false)
+	const [toggleHelp, setToggleHelp] = useState(false)
 
 	// variables to set center of graph
 	const [xCoor, setXCoor] = useState(0);
@@ -42,6 +43,7 @@ function App() {
 	// function to close Description sidebar
 	function closeDesc() {
 		maximizeFilter();
+		maximizeHelp();
 		setToggleDesc(false);
 		document.getElementById('description-button').style.color = '#9bc';
 		document.getElementById('description').style.top = '100%';
@@ -51,6 +53,9 @@ function App() {
 	function openDesc(isCourse, content) {
 		if (toggleFilter) {
 			minimizeFilter();
+		}
+		if (toggleHelp) {
+			minimizeHelp();
 		}
 		setToggleDesc(true);
 		document.getElementById('description-button').style.color = '#eee'
@@ -98,6 +103,16 @@ function App() {
 		document.getElementById('filter').style.height = '100%';
 	}
 
+	// function to set Help sidebar height to half when Description is open
+	function minimizeHelp() {
+		document.getElementById('help').style.height = '55%';
+	}
+
+	// function to return Help sidebar to its original size
+	function maximizeHelp() {
+		document.getElementById('help').style.height = '100%';
+	}
+
 	// function to close Search sidebar
 	function closeSearch() {
 		setToggleSearch(false);
@@ -108,6 +123,21 @@ function App() {
 	function openSearch() {
 		setToggleSearch(true);
 		document.getElementById('search').style.top = '25px';
+	}
+
+	// function to close Help sidebar
+	function closeHelp() {
+		setToggleHelp(false);
+		document.getElementById('help').style.right = '-420px';
+	}
+
+	// function to open Help sidebar
+	function openHelp() {
+		if (toggleDesc) {
+			minimizeHelp();
+		}
+		setToggleHelp(true);
+		document.getElementById('help').style.right = '0px';
 	}
 
 	// fetch graph data from backend
@@ -124,7 +154,7 @@ function App() {
 	}
 
 	useEffect(() => {
-		fetch(props.filterURI, {
+		fetch(filterURI, {
 			method: 'POST',
 			body: JSON.stringify(initialFilter)
 		})
@@ -149,7 +179,7 @@ function App() {
 				// console.log(prevLinkSet);
 				return prevLinkSet;
 			})
-			props.setGraphData(data)
+			setGraphData(data);
 		});
 	}, [])
 
@@ -234,12 +264,12 @@ function App() {
 		setClickNode(node);
 		highlightSurroundings(node);
 		setHoverNode(null);
-		graphRef.current.centerAt(props.toggleFilter ? node.x - 20 : node.x, node.y + 100, 400);
-		props.setXCoor(props.toggleFilter ? node.x - 20 : node.x);
-		props.setYCoor(node.y + 100);
+		graphRef.current.centerAt(toggleFilter ? node.x - 20 : node.x, node.y + 40, 400);
+		setXCoor(toggleFilter ? node.x - 20 : node.x);
+		setYCoor(node.y + 40);
 		node.cluster === false
-			? props.fetchCourseInfo(node)
-			: props.openDesc(false, "Not a course node");
+			? fetchCourseInfo(node)
+			: openDesc(false, "Not a course node");
 	}
 
 	function highlightSurroundings(node) {
@@ -248,14 +278,14 @@ function App() {
 		
 		if (node) {
 			setClickNode(node);
-			props.graphData.links
+			graphData.links
 				.filter(link => link.target === node)
 				.forEach(link => {
 					highlightLinks.add(link)
 					highlightNodes.add(link.source)
 					if (link.source.cluster)  {
 						const cluster = link.source
-						props.graphData.links
+						graphData.links
 							.filter(link => link.target === cluster)
 							.forEach(link => {
 								highlightLinks.add(link);
@@ -303,9 +333,11 @@ function App() {
 		toggleDesc: toggleDesc,
 		toggleFilter: toggleFilter,
 		toggleSearch: toggleSearch,
+		toggleHelp: toggleHelp,
 		setToggleDesc: setToggleDesc,
 		setToggleFilter: setToggleFilter,
 		setToggleSearch: setToggleSearch,
+		setToggleHelp: setToggleHelp,
 		
 		closeFilter: closeFilter,
 		openFilter: openFilter,
@@ -313,8 +345,12 @@ function App() {
 		openDesc: openDesc,
 		closeSearch: closeSearch,
 		openSearch: openSearch,
+		closeHelp: closeHelp,
+		openHelp: openHelp,
 		maximizeFilter: maximizeFilter,
 		minimizeFilter: minimizeFilter,
+		maximizeHelp: maximizeHelp,
+		minimizeHelp: minimizeHelp,
 
 		graphRef: graphRef,
 		xCoor: xCoor,

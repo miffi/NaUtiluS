@@ -1,7 +1,6 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, /*useEffect, */ useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide, forceManyBody, forceLink} from 'd3-force-3d'
-// import debounce from 'lodash.debounce'
+// import { forceCollide, forceManyBody, forceLink} from 'd3-force-3d'
 
 import './graph.css';
 
@@ -28,14 +27,14 @@ function Graph(props) {
 		setDisplayHeight(window.innerHeight);
 	});
 
-	useEffect(() => {
-		if (props.graphData) {
-			fgRef.current
-			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -10 : -100))
-			.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 40 : link.source.cluster === true ? 70 : 50))
-			.d3Force('collide', forceCollide(30).strength(0.3))
-		}
-	}, [props.graphData]);
+	// useEffect(() => {
+	// 	if (props.graphData) {
+	// 		fgRef.current
+	// 		.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -15 : -50))
+	// 		.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 40 : link.source.cluster === true ? 70 : 50))
+	// 		.d3Force('collide', forceCollide(30).strength(0.3))
+	// 	}
+	// }, [props.graphData]);
 
 	async function updateRightClick(neighbourObj) {
 		await fetch(props.expandNodeURI, {
@@ -134,7 +133,7 @@ function Graph(props) {
 				node === clickNode ? '#00ff00'
 				: node === hoverNode ? '#ffff00'
 				: props.highlightNodes.has(node) ? '#11dddd'
-				: '#9bc';
+				: node.color;
 			ctx.beginPath()
 			ctx.roundRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions, 5/globalScale);
 			ctx.fill()
@@ -160,12 +159,12 @@ function Graph(props) {
 		height={displayHeight}
 		maxZoom={10}
 		cooldownTicks={200}
-		// nodeAutoColorBy="faculty"
-		backgroundColor='#787878'
+		nodeAutoColorBy="department"
+		backgroundColor='#898989'
 		nodeVal={50}
 		linkDirectionalArrowLength={
 			link => {
-				return link.target.cluster === true ? 0 : 10
+				return link.target.cluster === true ? 0 : 5
 			}
 		}
 		linkColor={

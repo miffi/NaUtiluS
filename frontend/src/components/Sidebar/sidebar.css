@@ -9,7 +9,7 @@ a {
 	width: 70px;
 	position: absolute;
 	z-index: 2;
-	background-color: #6b6b6b;
+	background-color: #5f5f5f;
 	padding-top: 20px;
 	display: flex;
 	flex-direction: column;
@@ -18,7 +18,8 @@ a {
 
 .filter-button,
 .description-button,
-.search-button {
+.search-button,
+.help-button {
 	text-decoration: none;
 	text-align: center;
 	font-size: 30px;
