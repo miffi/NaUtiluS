@@ -1,9 +1,10 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide, forceManyBody, forceLink} from 'd3-force-3d'
+import { forceCollide } from 'd3-force-3d'
 // import debounce from 'lodash.debounce'
 
 import './graph.css';
+
 
 function Graph(props) {
 	const fgRef = props.graphRef;
@@ -29,13 +30,9 @@ function Graph(props) {
 	});
 
 	useEffect(() => {
-		if (props.graphData) {
-			fgRef.current
-			.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -10 : -100))
-			.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 40 : link.source.cluster === true ? 70 : 50))
-			.d3Force('collide', forceCollide(30).strength(0.3))
-		}
-	}, [props.graphData]);
+			fgRef.current.d3Force('link').distance((link) => link.target.cluster ? 10 : 30).strength(0.4);
+			fgRef.current.d3Force('collide', forceCollide(10).strength(0.20));
+	}, []);
 
 	async function updateRightClick(neighbourObj) {
 		await fetch(props.expandNodeURI, {
@@ -160,19 +157,18 @@ function Graph(props) {
 		height={displayHeight}
 		maxZoom={10}
 		cooldownTicks={200}
-		// nodeAutoColorBy="faculty"
+		nodeAutoColorBy="department"
 		backgroundColor='#787878'
 		nodeVal={50}
 		linkDirectionalArrowLength={
-			link => {
-				return link.target.cluster === true ? 0 : 10
-			}
-		}
+      () => 5
+    }
 		linkColor={
-			link => link.target.cluster === true ? "#80deea" : "#e0e0e0"
+			link => link.target.cluster ? "#80deea" : "#e0e0e0"
 		}
+    linkCurvature={0.20}
 		linkDirectionalArrowColor={
-			() => "#ffffff"
+			link => link.target.cluster ? "#80deea": "#e0e0e0"
 		}
 		linkDirectionalParticles={4}
 		linkDirectionalParticleSpeed={0.005}
