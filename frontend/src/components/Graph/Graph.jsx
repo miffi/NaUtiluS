@@ -160,11 +160,11 @@ function Graph(props) {
 		maxZoom={10}
 		cooldownTicks={200}
 		nodeAutoColorBy="department"
-		backgroundColor='#787878'
+		backgroundColor='#898989'
 		nodeVal={50}
 		linkDirectionalArrowLength={
 			link => {
-				return link.target.cluster === true ? 0 : 10
+				return link.target.cluster === true ? 0 : 5
 			}
 		}
 		linkColor={

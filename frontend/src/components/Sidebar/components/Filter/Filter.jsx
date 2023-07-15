@@ -48,8 +48,11 @@ function Filter(props) {
 		})
 		.then(data => {
 			// console.log(data);
-			if (!data.nodes || !data.links) window.alert('No courses fit this description!')
-			else {
+			if (!data.nodes) window.alert('No courses fit this description!')
+			else if (data.nodes && !data.links) {
+				data.links = [];
+				props.setGraphData(() => data)
+			} else {
 				props.updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
@@ -63,7 +66,7 @@ function Filter(props) {
 					return prevLinkSet;
 				})
 				props.setGraphData(() => data)
-				props.graphRef.current.zoom(1.7, 200)
+				props.graphRef.current.zoom(3, 100)
 				props.graphRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 200);
 			}
 		});
