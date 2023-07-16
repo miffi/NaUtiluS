@@ -14,6 +14,10 @@ function App() {
 	const departmentsURI = process.env.REACT_APP_BACKEND_HOSTNAME + '/v1/departments.json'
 	const expandNodeURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/expandNode.json"
 
+	//states for filter arrays
+	const [selectedDepartments, setSelectedDepartments] = useState(['Computer Science'])
+	const [selectedCourses, setSelectedCourses] = useState(['CS1010'])
+
 	// variables to handle toggle of Filter and Description sidebars
 	const [toggleFilter, setToggleFilter] = useState(false)
 	const [toggleDesc, setToggleDesc] = useState(false)
@@ -302,6 +306,8 @@ function App() {
 		setHighlightLinks(highlightLinks);
 	}
 
+	const [presentCourses, setPresentCourses] = useState(['CS1010']);
+
 	// pass on variables to props for other components  
 	let props = {
 		oldData: oldData,
@@ -339,6 +345,11 @@ function App() {
 		setToggleSearch: setToggleSearch,
 		setToggleHelp: setToggleHelp,
 		
+		selectedDepartments: selectedDepartments,
+		selectedCourses: selectedCourses,
+		setSelectedDepartments: setSelectedDepartments,
+		setSelectedCourses: setSelectedCourses,
+		
 		closeFilter: closeFilter,
 		openFilter: openFilter,
 		closeDesc: closeDesc,
@@ -369,17 +380,20 @@ function App() {
 
 		handleSingleClick: handleSingleClick,
 		highlightSurroundings: highlightSurroundings,
-		updateHighlight: updateHighlight
+		updateHighlight: updateHighlight,
+
+		presentCourses: presentCourses,
+		setPresentCourses: setPresentCourses
 	}
 
 	//check graphData
 	// useEffect(() => console.log(graphData), [graphData])
 	
 	return (
-		(courses && departments) &&
+		
 		<div className='App'>
-			<Sidebar {...props} />
-			<Graph {...props} />
+			{ (courses && departments) && <Sidebar {...props} /> }
+			{ graphData && <Graph {...props} /> }
 		</div>
 	)
 }

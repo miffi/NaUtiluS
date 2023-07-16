@@ -6,10 +6,8 @@ import Semesters from './components/Semesters/Semesters';
 import Limit from './components/Limit/Limit';
 
 function Filter(props) {
-	const [toggleDepartments, setToggleDepartments] = useState(false);
-	const [toggleCourses, setToggleCourses] = useState(false);
-	const [selectedDepartments, setSelectedDepartments] = useState(['Computer Science'])
-	const [selectedCourses, setSelectedCourses] = useState(['CS1010'])
+	const selectedDepartments = props.selectedDepartments;
+	const selectedCourses = props.selectedCourses;
 	const [toggleLimit, setToggleLimit] = useState(true);
 
 	function handleSubmit() {
@@ -21,6 +19,11 @@ function Filter(props) {
 			window.alert('Please specify a filter!');
 			return;
 		}
+
+		props.presentCourses.length = 0;
+		selectedCourses.forEach(val => props.presentCourses.push(val));
+		props.setPresentCourses(props.presentCourses);
+		console.log(props.presentCourses)
 
 		const filterObject = {
 			departments: selectedDepartments,
@@ -74,17 +77,8 @@ function Filter(props) {
 
 	const newProps = {
 		...props, 
-		toggleDepartments: toggleDepartments,
-		toggleCourses: toggleCourses,
 		toggleLimit: toggleLimit,
-		setToggleDepartments: setToggleDepartments,
-		setToggleCourses: setToggleCourses,
-		setToggleLimit: setToggleLimit,
-
-		selectedDepartments: selectedDepartments,
-		selectedCourses: selectedCourses,
-		setSelectedDepartments: setSelectedDepartments,
-		setSelectedCourses: setSelectedCourses		
+		setToggleLimit: setToggleLimit	
 	}
 
 	return (

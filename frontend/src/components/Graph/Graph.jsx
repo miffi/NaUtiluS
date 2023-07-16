@@ -1,4 +1,4 @@
-import React, { useCallback, /*useEffect, */ useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
 // import { forceCollide, forceManyBody, forceLink} from 'd3-force-3d'
 
@@ -26,6 +26,12 @@ function Graph(props) {
 		setDisplayWidth(window.innerWidth);
 		setDisplayHeight(window.innerHeight);
 	});
+
+	useEffect(() => {
+		if (props.graphData) {
+			fgRef.current.zoom(3)
+		}
+	}, [])
 
 	// useEffect(() => {
 	// 	if (props.graphData) {
@@ -133,6 +139,7 @@ function Graph(props) {
 				node === clickNode ? '#00ff00'
 				: node === hoverNode ? '#ffff00'
 				: props.highlightNodes.has(node) ? '#11dddd'
+				: props.presentCourses.includes(node.id) ? '#ffffff'
 				: node.color;
 			ctx.beginPath()
 			ctx.roundRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions, 5/globalScale);
