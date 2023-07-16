@@ -1,8 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-// import { forceCollide, forceManyBody, forceLink} from 'd3-force-3d'
+import { forceCollide } from 'd3-force-3d'
 
 import './graph.css';
+
 
 function Graph(props) {
 	const fgRef = props.graphRef;
@@ -29,18 +30,11 @@ function Graph(props) {
 
 	useEffect(() => {
 		if (props.graphData) {
-			fgRef.current.zoom(3)
+			fgRef.current.zoom(4.5)
+			fgRef.current.d3Force('link').distance((link) => link.target.cluster ? 10 : 30).strength(0.4);
+			fgRef.current.d3Force('collide', forceCollide(10).strength(0.20));
 		}
 	}, [])
-
-	// useEffect(() => {
-	// 	if (props.graphData) {
-	// 		fgRef.current
-	// 		.d3Force('charge', forceManyBody().strength(node => node.cluster === true ? -15 : -50))
-	// 		.d3Force('link', forceLink().distance(link => link.target.cluster === true ? 40 : link.source.cluster === true ? 70 : 50))
-	// 		.d3Force('collide', forceCollide(30).strength(0.3))
-	// 	}
-	// }, [props.graphData]);
 
 	async function updateRightClick(neighbourObj) {
 		await fetch(props.expandNodeURI, {
@@ -139,8 +133,10 @@ function Graph(props) {
 				node === clickNode ? '#00ff00'
 				: node === hoverNode ? '#ffff00'
 				: props.highlightNodes.has(node) ? '#11dddd'
-				: props.presentCourses.includes(node.id) ? '#ffffff'
-				: node.color;
+				: props.semesterFilter ? node.indirect
+					? props.presentCourses.includes(node.id) ? '#bbbbbb' : '#666666'
+					: props.presentCourses.includes(node.id) ? '#ffffff' : node.color
+				: props.presentCourses.includes(node.id) ? '#ffffff' : node.color;
 			ctx.beginPath()
 			ctx.roundRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions, 5/globalScale);
 			ctx.fill()
@@ -151,7 +147,7 @@ function Graph(props) {
 			ctx.fillText(label, node.x, node.y);
 
 			node.__bckgDimensions = bckgDimensions;
-		}, [hoverNode, clickNode])
+		}, [hoverNode, clickNode, props.graphData])
 
 	// handle graph loading and error
 	if (props.graphData == null) {
@@ -167,18 +163,17 @@ function Graph(props) {
 		maxZoom={10}
 		cooldownTicks={200}
 		nodeAutoColorBy="department"
-		backgroundColor='#898989'
+		backgroundColor='#787878'
 		nodeVal={50}
 		linkDirectionalArrowLength={
-			link => {
-				return link.target.cluster === true ? 0 : 5
-			}
-		}
+      () => 5
+    }
 		linkColor={
-			link => link.target.cluster === true ? "#80deea" : "#e0e0e0"
+			link => link.target.cluster ? "#80deea" : "#e0e0e0"
 		}
+    linkCurvature={0.20}
 		linkDirectionalArrowColor={
-			() => "#ffffff"
+			link => link.target.cluster ? "#80deea": "#e0e0e0"
 		}
 		linkDirectionalParticles={4}
 		linkDirectionalParticleSpeed={0.005}

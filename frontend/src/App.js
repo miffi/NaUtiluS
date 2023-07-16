@@ -184,6 +184,7 @@ function App() {
 				return prevLinkSet;
 			})
 			setGraphData(data);
+			// console.log(semesterFilter)
 		});
 	}, [])
 
@@ -308,6 +309,8 @@ function App() {
 
 	const [presentCourses, setPresentCourses] = useState(['CS1010']);
 
+	const [semesterFilter, setSemesterFilter] = useState(false);
+
 	// pass on variables to props for other components  
 	let props = {
 		oldData: oldData,
@@ -383,17 +386,20 @@ function App() {
 		updateHighlight: updateHighlight,
 
 		presentCourses: presentCourses,
-		setPresentCourses: setPresentCourses
+		setPresentCourses: setPresentCourses,
+
+		semesterFilter: semesterFilter,
+		setSemesterFilter: setSemesterFilter
 	}
 
 	//check graphData
 	// useEffect(() => console.log(graphData), [graphData])
 	
 	return (
-		
+		(courses && departments) &&
 		<div className='App'>
-			{ (courses && departments) && <Sidebar {...props} /> }
-			{ graphData && <Graph {...props} /> }
+			<Sidebar {...props} />
+			<Graph {...props} />
 		</div>
 	)
 }

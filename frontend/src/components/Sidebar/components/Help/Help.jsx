@@ -41,7 +41,8 @@ function Help() {
 				First, put in a filter. On initial load, there is a default filter given as an example.
 				After that you can interact with the graph:
 				<ul>
-					<li>Drag around nodes</li>
+          <li>Zoom with the scroll wheel</li>
+					<li>Left click and drag to drag nodes around</li>
 					<li>Left click nodes to show a description</li>
 					<li>Right click nodes to expand all of its direct relationships</li>
 				</ul>

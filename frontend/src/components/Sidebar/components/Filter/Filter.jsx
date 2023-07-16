@@ -20,10 +20,12 @@ function Filter(props) {
 			return;
 		}
 
+		if (semester === '') props.setSemesterFilter(() => false);
+		else props.setSemesterFilter(() => true);
+
 		props.presentCourses.length = 0;
 		selectedCourses.forEach(val => props.presentCourses.push(val));
 		props.setPresentCourses(props.presentCourses);
-		console.log(props.presentCourses)
 
 		const filterObject = {
 			departments: selectedDepartments,
@@ -32,8 +34,6 @@ function Filter(props) {
 			limit: limit
 		}
 		let filterQuery = JSON.stringify(filterObject);
-
-		// console.log(filterQuery);
 		sendData(filterQuery);
 	}
 
@@ -55,6 +55,7 @@ function Filter(props) {
 			else if (data.nodes && !data.links) {
 				data.links = [];
 				props.setGraphData(() => data)
+				//console.log(data)
 			} else {
 				props.updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
@@ -69,7 +70,8 @@ function Filter(props) {
 					return prevLinkSet;
 				})
 				props.setGraphData(() => data)
-				props.graphRef.current.zoom(3, 100)
+				//console.log(data)
+				props.graphRef.current.zoom(4.5)
 				props.graphRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 200);
 			}
 		});

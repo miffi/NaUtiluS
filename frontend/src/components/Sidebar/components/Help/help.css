@@ -5,7 +5,7 @@
 	padding-left: 10px;
 	padding-right: 10px;
 	position: fixed;
-	background-color: #787878;
+	background-color: #6b6b6b;
 	z-index: 0;
 	transition: right 200ms ease, height 200ms ease;
 	overflow: auto;
