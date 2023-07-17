@@ -185,7 +185,12 @@ function App() {
 			})
 			setGraphData(data);
 			// console.log(semesterFilter)
-		});
+		})
+		.catch(error => {
+			console.log('Error: failed to fetch graph data: ' + error);
+			setGraphError(error);
+		})
+		.finally(() => setGraphLoading(false));
 	}, [])
 
 	// fetch list of courses from nusmods
@@ -394,9 +399,15 @@ function App() {
 
 	//check graphData
 	// useEffect(() => console.log(graphData), [graphData])
-	
+	if (graphLoading || coursesLoading || departmentsLoading) {
+		return (
+			<div className='loading-window'>
+				<div className="lds-default"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
+				<div className='loading-text'>Loading...</div>
+			</div>
+		)
+	}
 	return (
-		(courses && departments) &&
 		<div className='App'>
 			<Sidebar {...props} />
 			<Graph {...props} />

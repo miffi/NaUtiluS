@@ -5,7 +5,7 @@ import './courses.css'
 function Courses(props) {
 	const delay = ms => new Promise(res => setTimeout(res, ms));
 
-	const listOfCourses = props.listOfCourses.map(course => course.courseCode);
+	const listOfCourses = props.listOfCourses
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
 	let selected = props.selectedCourses;
@@ -27,7 +27,7 @@ function Courses(props) {
 		let matchedChoices = [];
 		let input = document.getElementById('courses-search').value;
 		if (input.length) {
-			matchedChoices = listOfCourses.filter(course => course.toLowerCase().includes(input.toLowerCase()))
+			matchedChoices = listOfCourses.filter(course => (course.courseCode + ' ' + course.title).toLowerCase().includes(input.toLowerCase()))
 		} else if (input.length === 0) {
 			matchedChoices = listOfCourses;
 		}
@@ -42,8 +42,9 @@ function Courses(props) {
 			content =
 			<ul>
 				{matchedChoices.map(course => {
-					return <li key={course} className={'courses-choices'}
-						onClick={() => handleCourseSubmit(course)} onMouseDown={() => event.preventDefault()}>{course}</li>;
+					const courseText = course.courseCode + ' ' + course.title;
+					return <li key={course.courseCode} className={'courses-choices'}
+						onClick={() => handleCourseSubmit(course.courseCode)} onMouseDown={() => event.preventDefault()}>{courseText}</li>;
 				})}
 			</ul>
 		}
