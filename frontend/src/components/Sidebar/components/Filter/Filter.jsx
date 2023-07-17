@@ -6,10 +6,8 @@ import Semesters from './components/Semesters/Semesters';
 import Limit from './components/Limit/Limit';
 
 function Filter(props) {
-	const [toggleDepartments, setToggleDepartments] = useState(false);
-	const [toggleCourses, setToggleCourses] = useState(false);
-	const [selectedDepartments, setSelectedDepartments] = useState(['Computer Science'])
-	const [selectedCourses, setSelectedCourses] = useState(['CS1010'])
+	const selectedDepartments = props.selectedDepartments;
+	const selectedCourses = props.selectedCourses;
 	const [toggleLimit, setToggleLimit] = useState(true);
 
 	function handleSubmit() {
@@ -22,6 +20,13 @@ function Filter(props) {
 			return;
 		}
 
+		if (semester === '') props.setSemesterFilter(() => false);
+		else props.setSemesterFilter(() => true);
+
+		props.presentCourses.length = 0;
+		selectedCourses.forEach(val => props.presentCourses.push(val));
+		props.setPresentCourses(props.presentCourses);
+
 		const filterObject = {
 			departments: selectedDepartments,
 			courses: selectedCourses,
@@ -29,8 +34,6 @@ function Filter(props) {
 			limit: limit
 		}
 		let filterQuery = JSON.stringify(filterObject);
-
-		// console.log(filterQuery);
 		sendData(filterQuery);
 	}
 
@@ -52,6 +55,7 @@ function Filter(props) {
 			else if (data.nodes && !data.links) {
 				data.links = [];
 				props.setGraphData(() => data)
+				//console.log(data)
 			} else {
 				props.updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
@@ -66,7 +70,8 @@ function Filter(props) {
 					return prevLinkSet;
 				})
 				props.setGraphData(() => data)
-				props.graphRef.current.zoom(3, 100)
+				//console.log(data)
+				props.graphRef.current.zoom(4.5)
 				props.graphRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 200);
 			}
 		});
@@ -74,17 +79,8 @@ function Filter(props) {
 
 	const newProps = {
 		...props, 
-		toggleDepartments: toggleDepartments,
-		toggleCourses: toggleCourses,
 		toggleLimit: toggleLimit,
-		setToggleDepartments: setToggleDepartments,
-		setToggleCourses: setToggleCourses,
-		setToggleLimit: setToggleLimit,
-
-		selectedDepartments: selectedDepartments,
-		selectedCourses: selectedCourses,
-		setSelectedDepartments: setSelectedDepartments,
-		setSelectedCourses: setSelectedCourses		
+		setToggleLimit: setToggleLimit	
 	}
 
 	return (
