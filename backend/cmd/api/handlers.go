@@ -45,6 +45,7 @@ func (app *application) courseSummary(w http.ResponseWriter, r *http.Request) {
 	data, err := app.dbquery.CourseSummaries(r.Context())
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
+		return
 	}
 
 	err = app.writeJSON(w, http.StatusOK, data, nil)
