@@ -10,7 +10,7 @@ import (
 )
 
 func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
-	data, err := app.dbquery.QueryFullGraph(r.Context())
+	data, err := app.dbquery.FullGraph(r.Context())
 	if err != nil {
 		app.serverErrorResponse(w, r, err)
 	}

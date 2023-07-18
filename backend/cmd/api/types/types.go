@@ -27,7 +27,12 @@ type Link struct {
 	TargetName string `json:"target"`
 }
 
-type Detail struct {
+type NodeNeighbors struct {
+	Name      string   `json:"name"`
+	Neighbors []string `json:"neighbors"`
+}
+
+type Course struct {
 	Preclusion   string `json:"preclusion"`
 	Prerequisite string `json:"prerequisite"`
 
@@ -43,46 +48,7 @@ type Detail struct {
 	Semesters []string `json:"semesters"`
 }
 
-type Summary struct {
+type CourseSummary struct {
 	Code  string `json:"courseCode"`
 	Title string `json:"title"`
-}
-
-type NodeNeighbors struct {
-	Name      string   `json:"name"`
-	Neighbors []string `json:"neighbors"`
-}
-
-// Type holding all the information for one course.
-// The json tags correspond to their names in the NUSMods API.
-type CourseDetails struct {
-	Preclusion   string `json:"preclusion"`
-	Prerequisite string `json:"prerequisite"`
-
-	Description string `json:"description"`
-
-	Title      string `json:"title"`
-	Department string `json:"department"`
-	Faculty    string `json:"faculty"`
-
-	CourseCode   string `json:"moduleCode"`
-	CourseCredit string `json:"moduleCredit"`
-
-	SemesterData []Semester `json:"semesterData"`
-
-	PrerequisiteRule string `json:"prerequisiteRule"`
-	PreclusionRule   string `json:"preclusionRule"`
-	CorequisiteRule  string `json:"courequisiteRule"`
-}
-
-type Semester struct {
-	Number int `json:"semester"`
-}
-
-// Type holding a summary of a course.
-// The json tags correspond to their names in the NUSMods API.
-type CourseSummary struct {
-	Code      string `json:"moduleCode"`
-	Title     string `json:"title"`
-	Semesters []int  `json:"semesters"`
 }

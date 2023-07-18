@@ -6,6 +6,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/miffi/nautilus/backend/cmd/api/types"
 	"github.com/miffi/nautilus/backend/cmd/db"
 	"github.com/rs/zerolog"
 	"golang.org/x/time/rate"
@@ -57,10 +58,9 @@ func main() {
 		logger.Info().Msg("")
 	} */
 
-	query := NewNUSModsQuery(logger)
 	ratelimit := rate.NewLimiter(rate.Every(2*time.Second), 4)
 
-	summaries, err := query.GetCourseSummaries("2022-2023")
+	summaries, err := getCourseSummaries("2022-2023")
 	if err != nil {
 		logger.Fatal().Err(err).Msg("")
 	}
@@ -70,16 +70,49 @@ func main() {
 		if err != nil {
 			logger.Fatal().Err(err).Msg("")
 		}
-		details, err := query.GetCourseDetails("2022-2023", summary.Code)
+		details, err := getCourseDetails("2022-2023", summary.Code)
 		if err != nil {
 			logger.Fatal().Err(err).Msg("")
 		}
 
-		err = db.AddCourse(context.TODO(), details)
+		err = db.AddCourse(context.TODO(), convertNUSModsDetailsToCourse(details))
 		if err != nil {
 			logger.Fatal().Err(err).Msg("")
 		}
 
 		logger.Info().Str("Course", details.CourseCode).Msg("")
+	}
+}
+
+func convertNUSModsDetailsToCourse(details courseDetails) types.Course {
+	var semesters []string
+	for _, semester := range details.SemesterData {
+		semesters = append(semesters, parseSemester(semester.Number))
+	}
+
+	return types.Course{
+		Preclusion:   details.Preclusion,
+		Prerequisite: details.Prerequisite,
+		Description:  details.Description,
+		Title:        details.Title,
+		Department:   details.Department,
+		Faculty:      details.Faculty,
+		Code:         details.CourseCode,
+		Credit:       details.CourseCredit,
+		Semesters:    semesters,
+	}
+}
+
+func parseSemester(num int) string {
+	switch num {
+	case 2:
+		return "Semester 2"
+	case 3:
+		return "Special Semester 1"
+	case 4:
+		return "Special Semester 2"
+	// no obvious way to handle other numbers
+	default:
+		return "Semester 1"
 	}
 }

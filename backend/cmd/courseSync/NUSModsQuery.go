@@ -7,9 +7,6 @@ import (
 	"io"
 	"net/http"
 	"regexp"
-
-	"github.com/miffi/nautilus/backend/cmd/api/types"
-	"github.com/rs/zerolog"
 )
 
 const apiEndPoint = "https://api.nusmods.com/v2"
@@ -19,17 +16,32 @@ var (
 	ErrInvalidYearRange = errors.New("invalid date range format")
 )
 
-type NUSModsQuery interface {
-	GetCourseSummaries(yearRange string) ([]types.CourseSummary, error)
-	GetCourseDetails(yearRange, courseCode string) (types.CourseDetails, error)
+type courseDetails struct {
+	Preclusion   string `json:"preclusion"`
+	Prerequisite string `json:"prerequisite"`
+
+	Description string `json:"description"`
+
+	Title      string `json:"title"`
+	Department string `json:"department"`
+	Faculty    string `json:"faculty"`
+
+	CourseCode   string `json:"moduleCode"`
+	CourseCredit string `json:"moduleCredit"`
+
+	SemesterData []struct {
+		Number int `json:"semester"`
+	} `json:"semesterData"`
+
+	PrerequisiteRule string `json:"prerequisiteRule"`
+	PreclusionRule   string `json:"preclusionRule"`
+	CorequisiteRule  string `json:"courequisiteRule"`
 }
 
-func NewNUSModsQuery(logger zerolog.Logger) NUSModsQuery {
-	return &nusModsQuery{logger: logger}
-}
-
-type nusModsQuery struct {
-	logger zerolog.Logger
+type courseSummary struct {
+	Code      string `json:"moduleCode"`
+	Title     string `json:"title"`
+	Semesters []int  `json:"semesters"`
 }
 
 var dateRegex = regexp.MustCompile(`^\d{4}-\d{4}$`)
@@ -38,7 +50,7 @@ func isYearRangeInvalid(yearRange string) bool {
 	return !dateRegex.MatchString(yearRange)
 }
 
-func (query *nusModsQuery) GetCourseDetails(yearRange string, courseCode string) (details types.CourseDetails, err error) {
+func getCourseDetails(yearRange string, courseCode string) (details courseDetails, err error) {
 	if isYearRangeInvalid(yearRange) {
 		err = ErrInvalidYearRange
 		return
@@ -54,7 +66,7 @@ func (query *nusModsQuery) GetCourseDetails(yearRange string, courseCode string)
 	return
 }
 
-func (query *nusModsQuery) GetCourseSummaries(yearRange string) (summaries []types.CourseSummary, err error) {
+func getCourseSummaries(yearRange string) (summaries []courseSummary, err error) {
 	if isYearRangeInvalid(yearRange) {
 		return nil, ErrInvalidYearRange
 	}
