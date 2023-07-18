@@ -25,9 +25,9 @@ type config struct {
 
 // A store of the application wide state of the web server.
 type application struct {
-	config  config
-	logger  zerolog.Logger
-	dbquery db.DbQuery
+	CORSAddress string
+	logger      zerolog.Logger
+	dbquery     db.DbQuery
 }
 
 func main() {
@@ -51,14 +51,19 @@ func main() {
 		}
 	}()
 
+	CORSAddress := ""
+	if config.localCORS {
+		CORSAddress = "https://nautilus-delta.vercel.app"
+	} else {
+		CORSAddress = fmt.Sprintf("http://localhost:%d", config.localCORSPort)
+	}
+
 	app := &application{
-		config,
+		CORSAddress,
 		logger,
 		dbquery,
 	}
-
 	router := app.routes()
-
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", config.port),
 		Handler:      router,
