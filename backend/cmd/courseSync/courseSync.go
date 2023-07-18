@@ -6,8 +6,8 @@ import (
 	"os"
 	"time"
 
-	"github.com/miffi/nautilus/backend/cmd/api/types"
 	"github.com/miffi/nautilus/backend/cmd/db"
+	"github.com/miffi/nautilus/backend/cmd/types"
 	"github.com/rs/zerolog"
 	"golang.org/x/time/rate"
 )

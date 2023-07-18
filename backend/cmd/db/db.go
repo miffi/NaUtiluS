@@ -3,7 +3,7 @@ package db
 import (
 	"context"
 
-	"github.com/miffi/nautilus/backend/cmd/api/types"
+	"github.com/miffi/nautilus/backend/cmd/types"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/rs/zerolog"
 )

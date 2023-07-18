@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/julienschmidt/httprouter"
-	"github.com/miffi/nautilus/backend/cmd/api/types"
+	"github.com/miffi/nautilus/backend/cmd/types"
 )
 
 func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
