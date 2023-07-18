@@ -120,7 +120,6 @@ MATCH (cluster:Cluster)-[:REQUIRES]-(:Course)`)
 		sb.WriteString(`RETURN cluster.name AS name, "" AS department, true AS cluster, false AS indirect`)
 	}
 
-	fmt.Println(sb.String())
 	return sb.String()
 }
 
