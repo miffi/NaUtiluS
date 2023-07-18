@@ -1,7 +1,6 @@
 package main
 
 import (
-	"encoding/json"
 	"net/http"
 	"strings"
 
@@ -23,7 +22,7 @@ func (app *application) fullGraph(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) filterPost(w http.ResponseWriter, r *http.Request) {
 	var options types.FilterOptions
-	err := json.NewDecoder(r.Body).Decode(&options)
+	err := app.readJSON(w, r, &options)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
@@ -85,7 +84,7 @@ func (app *application) departments(w http.ResponseWriter, r *http.Request) {
 
 func (app *application) expandNode(w http.ResponseWriter, r *http.Request) {
 	var neighbors types.NodeNeighbors
-	err := json.NewDecoder(r.Body).Decode(&neighbors)
+	err := app.readJSON(w, r, &neighbors)
 	if err != nil {
 		app.badRequestResponse(w, r, err)
 		return
