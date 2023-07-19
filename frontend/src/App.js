@@ -274,9 +274,9 @@ function App() {
 		setClickNode(node);
 		highlightSurroundings(node);
 		setHoverNode(null);
-		graphRef.current.centerAt(toggleFilter ? node.x - 20 : node.x, node.y + 40, 400);
-		setXCoor(toggleFilter ? node.x - 20 : node.x);
-		setYCoor(node.y + 40);
+		graphRef.current.centerAt(node.x, node.y + 10, 400);
+		setXCoor(node.x);
+		setYCoor(node.y + 10);
 		node.cluster === false
 			? fetchCourseInfo(node)
 			: openDesc(false, "Not a course node");

@@ -5,8 +5,12 @@ import hoverNode from './hoverNode.png'
 import relationshipNode from './relationshipNode.png'
 import clusterNode from './clusterNode.png'
 import courseNode from './courseNode.png'
+import chosenNode from './chosenNode.png'
+import courseNodeDim from './courseNodeDim.png'
+import chosenNodeDim from './chosenNodeDim.png'
 import choiceRelationship from './choiceRelationship.png'
 import requirementRelationship from './requirementRelationship.png'
+import departmentAutoColor from './departmentAutoColor.png'
 
 function Help() {
 	return (
@@ -21,11 +25,15 @@ function Help() {
 			<h4>Nodes</h4>
 			<div style={{display: 'flex', alignItems: 'center'}}>
 				<img className='image' src={courseNode} alt="courseNode.png" />
-				<p className='label'>Courses nodes represent NUS courses</p>
+				<p className='label'>Course nodes represent NUS courses</p>
 			</div>
 			<div style={{display: 'flex', alignItems: 'center'}}>
 				<img className='image' src={clusterNode} alt="clusterNode.png" />
 				<p className='label'>Cluster nodes represent choices of courses that is required to take another course</p>
+			</div>
+			<div style={{display: 'flex', alignItems: 'center'}}>
+				<img className='image2' src={departmentAutoColor} alt="departmentAutoColor.png" />
+				<p className='label'>Course nodes are auto-colored by departments</p>
 			</div>
 			<h4>Relationships</h4>
 			<div style={{display: 'flex', alignItems: 'center'}}>
@@ -48,12 +56,12 @@ function Help() {
 				</ul>
 				Left-clicking on a node will highlight surrounding nodes:
 				<div style={{display: 'flex', alignItems: 'center'}}>
-					<img className='image' src={clickNode} alt="clickNode.png" />
-					<p className='label'>Clicked course node is highlighted green</p>
-				</div>
-				<div style={{display: 'flex', alignItems: 'center'}}>
 					<img className='image' src={hoverNode} alt="hoverNode.png" />
 					<p className='label'>Hovered course node is highlighted yellow</p>
+				</div>
+				<div style={{display: 'flex', alignItems: 'center'}}>
+					<img className='image' src={clickNode} alt="clickNode.png" />
+					<p className='label'>Clicked course node is highlighted green</p>
 				</div>
 				<div style={{display: 'flex', alignItems: 'center'}}>
 					<img className='image' src={relationshipNode} alt="relationshipNode.png" />
@@ -62,13 +70,26 @@ function Help() {
 			</p>
 			<h3>How to use the filter?</h3>
 			<p>
-				Currently there are four options in the filter. You can input departments
+				Currently there are four options in the filter, which will be applied only when the Apply button is clicked:
 				<ul>
 					<li>Departments: show courses only from specified departments</li>
 					<li>Finished Courses: show only the selected courses and their relationships</li>
 					<li>Limit: limits the number of outward relationships from the selected finished courses</li>
 					<li>Semester: dims courses that are not available on the chosen semester</li>
 				</ul>
+				For the filters, there will be additional node highlighting and dimming:
+				<div style={{display: 'flex', alignItems: 'center'}}>
+					<img className='image' src={chosenNode} alt="chosenNode.png" />
+					<p className='label'>Courses selected in Finished Courses will be highlighted white</p>
+				</div>
+				<div style={{display: 'flex', alignItems: 'center'}}>
+					<img className='image' src={chosenNodeDim} alt="chosenNodeDim.png" />
+					<p className='label'>Courses selected in Finished Courses will be dimmed light grey if unavailable in the current semester</p>
+				</div>
+				<div style={{display: 'flex', alignItems: 'center'}}>
+					<img className='image' src={courseNodeDim} alt="courseNodeDim.png" />
+					<p className='label'>Normal course nodes will be dimmed dark grey if unavailable in the current semester</p>
+				</div>
 			</p>
 			
 		</div>
