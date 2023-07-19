@@ -222,7 +222,7 @@ func addClusterTxFunc(ctx context.Context, howMany int, nodeNames []string) neo4
 		WITH c
 		UNWIND $names as name
 		MATCH (n:Main { name: name })
-		CREATE (c)-[:REQUIRES]->(n)
+		MERGE (c)-[:REQUIRES]->(n)
 		RETURN c.name, count(n)
 	`
 	return func(tx neo4j.ManagedTransaction) (string, error) {
