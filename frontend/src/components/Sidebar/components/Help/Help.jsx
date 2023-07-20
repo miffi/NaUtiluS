@@ -51,10 +51,10 @@ function Help() {
 				<ul>
           <li>Zoom with the scroll wheel</li>
 					<li>Left click and drag to drag nodes around</li>
-					<li>Left click nodes to show a description</li>
+					<li>Left click nodes to show a description and highlight direct requirements</li>
 					<li>Right click nodes to expand all of its direct relationships</li>
 				</ul>
-				Left-clicking on a node will highlight surrounding nodes:
+				Hovering and left-clicking on a node will highlight surrounding nodes:
 				<div style={{display: 'flex', alignItems: 'center'}}>
 					<img className='image' src={hoverNode} alt="hoverNode.png" />
 					<p className='label'>Hovered course node is highlighted yellow</p>
@@ -65,7 +65,7 @@ function Help() {
 				</div>
 				<div style={{display: 'flex', alignItems: 'center'}}>
 					<img className='image' src={relationshipNode} alt="relationshipNode.png" />
-					<p className='label'>Required courses of a clicked course node will be highlighted blue</p>
+					<p className='label'>Directly required courses of a clicked course node will be highlighted blue</p>
 				</div>
 			</p>
 			<h3>How to use the filter?</h3>
