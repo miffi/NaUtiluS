@@ -1,15 +1,24 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './search.css';
 import { HiChevronDown, HiChevronUp } from "react-icons/hi"
 
 function Search(props) {
 
-	const availableChoices = props.listOfCourses;
+	const listOfCourses = props.listOfCourses;
+	let availableChoices = [];
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
 
 	const openDesc = props.openDesc;
 	const graphData = props.graphData;
+	const nodeSet = props.nodeSet
+
+	useEffect(() => {
+		availableChoices = listOfCourses.filter(course => {
+			const courseCode = course.courseCode
+			return nodeSet.has(courseCode)
+		})
+	}, [graphData])
 	
 	function displaySuggestions() {
 		setToggleSuggestions(true);
@@ -48,7 +57,7 @@ function Search(props) {
     }
 	}
 
-	function handleFilterChoices() {
+	const handleFilterChoices = useCallback(() => {
 		displaySuggestions();
 		let matchedChoices = [];
 		let input = document.getElementById('search-bar').value;
@@ -79,7 +88,7 @@ function Search(props) {
 			</ul>
 		}
 		setAutoComplete(content);
-	}
+	}, [graphData])
 
 	return (
 	<>
