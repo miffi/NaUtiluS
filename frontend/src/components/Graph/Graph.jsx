@@ -6,6 +6,13 @@ import './graph.css';
 
 
 function Graph(props) {
+	const expandNodeURI = props.expandNodeURI;
+
+	const graphData = props.graphData;
+	const loading = props.graphLoading;
+	const error = props.graphError;
+	const setGraphData = props.setGraphData;
+
 	const fgRef = props.graphRef;
 	const nodeSet = props.nodeSet;
 	const linkSet = props.linkSet;
@@ -20,6 +27,15 @@ function Graph(props) {
 	const	setHoverNode = props.setHoverNode;
 	const	setClickNode = props.setClickNode;
 
+	const highlightLinks = props.highlightLinks;
+	const highlightNodes = props.highlightNodes;
+	const updateHighlight = props.updateHighlight;
+
+	const closeDesc = props.closeDesc;
+	const handleSingleClick = props.handleSingleClick;
+	const presentCourses = props.presentCourses;
+	const semesterFilter = props.semesterFilter;
+
 	// const [dblclickNode, setDblclickNode] = useState(null);
 
 	// handle window resize
@@ -29,7 +45,7 @@ function Graph(props) {
 	});
 
 	useEffect(() => {
-		if (props.graphData) {
+		if (graphData) {
 			fgRef.current.zoom(4.5)
 			fgRef.current.d3Force('link').distance((link) => link.target.cluster ? 10 : 30).strength(0.4);
 			fgRef.current.d3Force('collide', forceCollide(10).strength(0.20));
@@ -37,7 +53,7 @@ function Graph(props) {
 	}, [])
 
 	async function updateRightClick(neighbourObj) {
-		await fetch(props.expandNodeURI, {
+		await fetch(expandNodeURI, {
 			method: 'POST',
 			body: JSON.stringify(neighbourObj)
 		})
@@ -48,17 +64,11 @@ function Graph(props) {
 			return response.json();
 		})
 		.then(data => {
-			// console.log(props.graphData)
-			// console.log('sets before:')
-			// console.log(nodeSet)
-			// console.log(linkSet)
-			// console.log('data received from expandNode.json:')
-			// console.log(data)
 			const expandNodes = data.nodes;
 			const expandLinks = data.links;
 			const newNodes = [];
 			const newLinks = [];
-			if (expandNodes === null || expandLinks === null) return;
+			if (expandNodes === null || expandLinks === null) return; //Add an alert
 			expandNodes.forEach(node => {
 				if (!nodeSet.has(node.id)) {
 					nodeSet.add(node.id);
@@ -80,7 +90,7 @@ function Graph(props) {
 			// console.log('nodes and links to be added:' + JSON.stringify(newNodes))
 			// console.log(newNodes);
 			// console.log(newLinks)
-			props.setGraphData(({nodes, links}) => {
+			setGraphData(({nodes, links}) => {
 				return {
 					nodes: [...nodes, ...newNodes],
 					links: [...links, ...newLinks]
@@ -95,27 +105,27 @@ function Graph(props) {
 	function handleRightClick(node) {
 		const name = node.id;
 
-		const neighborsTo = props.graphData.links
+		const neighborsTo = graphData.links
 			.filter(link => link.source === node)
 			.map(link => link.target.id)
-		const neighborsFrom = props.graphData.links
+		const neighborsFrom = graphData.links
 			.filter(link => link.target === node)
 			.map(link => link.source.id)
 		const neighbors = neighborsTo.concat(neighborsFrom)
 		
 		const object = {
 			name: name,
-			neighbors: neighbors
+			neighbors: neighbors,
+			semester: semesterFilter
 		}
 		
 		updateRightClick(object)
-
 	}
 
 	const nodeStyle = useCallback(
 		(node, ctx, globalScale) => {
 			if (node.cluster === true) {
-				ctx.fillStyle = props.highlightNodes.has(node) ? '#77ddff' : '#e0e0e0';
+				ctx.fillStyle = highlightNodes.has(node) ? '#77ddff' : '#e0e0e0';
 				ctx.beginPath();
 				ctx.ellipse(node.x, node.y, 10 / globalScale, 10 / globalScale, 0, 0, 2 * Math.PI);
 				ctx.fill();
@@ -132,11 +142,11 @@ function Graph(props) {
 			ctx.fillStyle =
 				node === clickNode ? '#00ff00'
 				: node === hoverNode ? '#ffff00'
-				: props.highlightNodes.has(node) ? '#11dddd'
-				: props.semesterFilter ? node.indirect
-					? props.presentCourses.includes(node.id) ? '#bbbbbb' : '#666666'
-					: props.presentCourses.includes(node.id) ? '#ffffff' : node.color
-				: props.presentCourses.includes(node.id) ? '#ffffff' : node.color;
+				: highlightNodes.has(node) ? '#11dddd'
+				: semesterFilter ? node.indirect
+					? presentCourses.includes(node.id) ? '#bbbbbb' : '#666666'
+					: presentCourses.includes(node.id) ? '#ffffff' : node.color
+				: presentCourses.includes(node.id) ? '#ffffff' : node.color;
 			ctx.beginPath()
 			ctx.roundRect(node.x - bckgDimensions[0] / 2, node.y - bckgDimensions[1] / 2, ...bckgDimensions, 5/globalScale);
 			ctx.fill()
@@ -147,17 +157,17 @@ function Graph(props) {
 			ctx.fillText(label, node.x, node.y);
 
 			node.__bckgDimensions = bckgDimensions;
-		}, [hoverNode, clickNode, props.graphData])
+		}, [hoverNode, clickNode, graphData])
 
 	// handle graph loading and error
-	if (props.graphData == null) {
-		if (props.loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
-		if (props.error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
+	if (graphData == null) {
+		if (loading) return <div className="loading-fetch">Fetching Graph Data...</div>;
+		if (error) return <div className="loading-error">Error! Failed to fetch graph data</div>;
 	}
 		return <ForceGraph2D
 		ref={fgRef}
 		className='force-graph-2D'
-		graphData={props.graphData}
+		graphData={graphData}
 		width={displayWidth}
 		height={displayHeight}
 		maxZoom={10}
@@ -177,7 +187,7 @@ function Graph(props) {
 		}
 		linkDirectionalParticles={4}
 		linkDirectionalParticleSpeed={0.005}
-		linkDirectionalParticleWidth={link => props.highlightLinks.has(link) ? 4 : 0}
+		linkDirectionalParticleWidth={link => highlightLinks.has(link) ? 4 : 0}
 		nodeRelSize={50}
 		nodeCanvasObject={nodeStyle}
 		nodePointerAreaPaint={
@@ -197,7 +207,7 @@ function Graph(props) {
 		}
 		onNodeClick={node => {
 			// console.log('Single click');
-			props.handleSingleClick(node);
+			handleSingleClick(node);
 		}}
 		onNodeRightClick={ node =>{
 			// console.log('Right click')
@@ -207,15 +217,12 @@ function Graph(props) {
 			setHoverNode(node || null);
 		}}
 		onBackgroundClick={() => {
-			props.closeDesc();
+			closeDesc();
 			setHoverNode(null);
 			setClickNode(null);
-			props.highlightNodes.clear();
-			props.highlightLinks.clear();
-			props.updateHighlight();
-			// fgRef.current.centerAt(props.toggleFilter ? -20 : 0, 0, 400);
-			// props.setXCoor(props.toggleFilter ? -20 : 0);
-			// props.setYCoor(0);
+			highlightNodes.clear();
+			highlightLinks.clear();
+			updateHighlight();
 		}}
 	/>
 }

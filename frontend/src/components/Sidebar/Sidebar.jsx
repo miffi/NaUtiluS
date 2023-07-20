@@ -7,16 +7,32 @@ import Search from './components/Search/Search';
 import Help from './components/Help/Help';
 
 function Sidebar(props) {
+	const toggleFilter = props.toggleFilter;
+	const closeFilter = props.closeFilter;
+	const openFilter = props.openFilter;
+
+	const toggleDesc = props.toggleDesc;
+	const closeDesc = props.closeDesc;
+	const openDesc = props.openDesc;
+
+	const toggleSearch = props.toggleSearch;
+	const closeSearch = props.closeSearch;
+	const openSearch = props.openSearch;
+
+	const toggleHelp = props.toggleHelp;
+	const closeHelp = props.closeHelp;
+	const openHelp = props.openHelp;
+
 	return (
 		<>
 			<div className='menu-bar' id='menu_bar'>
 				<HiFilter title='Filter' className='filter-button' id='filter-button' onClick={
 					() => {
-						if (props.toggleFilter) {
-							props.closeFilter();
+						if (toggleFilter) {
+							closeFilter();
 							document.getElementById('filter-button').style.color = '#9bc';
 						} else {
-							props.openFilter();
+							openFilter();
 							document.getElementById('filter-button').style.color = '#eee';
 						}
 					}
@@ -27,15 +43,15 @@ function Sidebar(props) {
 				} onMouseLeave={
 					() => {
 						document.getElementById('filter-button').style.color = 
-						props.toggleFilter ? '#eee' : '#9bc';
+						toggleFilter ? '#eee' : '#9bc';
 					}
 				}/>
 				<HiDotsCircleHorizontal id='description-button' title="Course Information" className="description-button" onClick={
 					() => {
-						if (props.toggleDesc) {
-							props.closeDesc();
+						if (toggleDesc) {
+							closeDesc();
 						} else {
-							props.openDesc(false, "Click on a node to view course information");
+							openDesc(false, "Click on a node to view course information");
 						}
 					}
 				} onMouseEnter={
@@ -45,16 +61,16 @@ function Sidebar(props) {
 				} onMouseLeave={
 					() => {
 						document.getElementById('description-button').style.color = 
-						props.toggleDesc ? '#eee' : '#9bc';
+						toggleDesc ? '#eee' : '#9bc';
 					}
 				} />
 				<HiSearch id='search-button' title="Search" className="search-button" onClick={
 					() => {
-						if (props.toggleSearch) {
-							props.closeSearch();
+						if (toggleSearch) {
+							closeSearch();
 							document.getElementById('search-button').style.color = '#9bc';
 						} else {
-							props.openSearch(); /*TODO*/
+							openSearch(); /*TODO*/
 							document.getElementById('search-button').style.color = '#eee';
 						}
 					}
@@ -65,16 +81,16 @@ function Sidebar(props) {
 				} onMouseLeave={
 					() => {
 						document.getElementById('search-button').style.color = 
-						props.toggleSearch ? '#eee' : '#9bc';
+						toggleSearch ? '#eee' : '#9bc';
 					}
 				} />
 				<HiQuestionMarkCircle id='help-button' title="Help" className="help-button" onClick={
 					() => {
-						if (props.toggleHelp) {
-							props.closeHelp();
+						if (toggleHelp) {
+							closeHelp();
 							document.getElementById('help-button').style.color = '#9bc';
 						} else {
-							props.openHelp();
+							openHelp();
 							document.getElementById('help-button').style.color = '#eee';
 						}
 					}
@@ -85,7 +101,7 @@ function Sidebar(props) {
 				} onMouseLeave={
 					() => {
 						document.getElementById('help-button').style.color = 
-						props.toggleHelp ? '#eee' : '#9bc';
+						toggleHelp ? '#eee' : '#9bc';
 					}
 				} />
 			</div>
