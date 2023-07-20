@@ -7,6 +7,9 @@ function Search(props) {
 	const availableChoices = props.listOfCourses;
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
+
+	const openDesc = props.openDesc;
+	const graphData = props.graphData;
 	
 	function displaySuggestions() {
 		setToggleSuggestions(true);
@@ -20,14 +23,14 @@ function Search(props) {
 
 	function handleSearchSubmit(courseName) {
 		// console.log(props.graphData)
-		if (props.graphData === null) {
+		if (graphData === null) {
 			window.alert("The server is currently down, please try again later");
 			return;
 		}
 		// console.log(courseName);
-		const node = props.graphData.nodes.filter(node => node.id === courseName)
+		const node = graphData.nodes.filter(node => node.id === courseName)
 		if (node[0] === undefined) {
-			props.openDesc(false, "Course not found!");
+			openDesc(false, "Course not found!");
 		}
 		else {
 			const courseData = node[0]

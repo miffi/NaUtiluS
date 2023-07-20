@@ -8,8 +8,8 @@ function Courses(props) {
 	const listOfCourses = props.listOfCourses
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
-	let selected = props.selectedCourses;
-	let setSelected = props.setSelectedCourses;
+	const selected = props.selectedCourses;
+	const setSelected = props.setSelectedCourses;
 	const setToggleLimit = props.setToggleLimit
 
 	function displaySuggestions() {
