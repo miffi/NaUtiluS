@@ -17,7 +17,9 @@ function Filter(props) {
 
 	const setSemesterFilter = props.setSemesterFilter;
 	const presentCourses = props.presentCourses;
+	const presentDepartments = props.presentDepartments;
 	const setPresentCourses = props.setPresentCourses;
+	const setPresentDepartments = props.setPresentDepartments;
 
 	const updateNodeSet = props.updateNodeSet;
 	const updateLinkSet = props.updateLinkSet;
@@ -37,6 +39,10 @@ function Filter(props) {
 		presentCourses.length = 0;
 		selectedCourses.forEach(val => presentCourses.push(val));
 		setPresentCourses(presentCourses);
+
+		presentDepartments.length = 0;
+		selectedDepartments.forEach(val => presentDepartments.push(val));
+		setPresentDepartments(presentDepartments);
 
 		const filterObject = {
 			departments: selectedDepartments,

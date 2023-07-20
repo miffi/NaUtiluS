@@ -24,8 +24,8 @@ function Graph(props) {
 
 	const hoverNode = props.hoverNode;
 	const clickNode = props.clickNode;
-	const	setHoverNode = props.setHoverNode;
-	const	setClickNode = props.setClickNode;
+	const setHoverNode = props.setHoverNode;
+	const setClickNode = props.setClickNode;
 
 	const highlightLinks = props.highlightLinks;
 	const highlightNodes = props.highlightNodes;
@@ -34,7 +34,9 @@ function Graph(props) {
 	const closeDesc = props.closeDesc;
 	const handleSingleClick = props.handleSingleClick;
 	const presentCourses = props.presentCourses;
+	const presentDepartments = props.presentDepartments;
 	const semesterFilter = props.semesterFilter;
+	const expandAll = props.expandAll;
 
 	// const [dblclickNode, setDblclickNode] = useState(null);
 
@@ -68,9 +70,12 @@ function Graph(props) {
 			const expandLinks = data.links;
 			const newNodes = [];
 			const newLinks = [];
-			if (expandNodes === null || expandLinks === null) return; //Add an alert
+			if (expandNodes === null || expandLinks === null) {
+				window.alert("Node can no longer be expanded");
+				return;
+			}
 			expandNodes.forEach(node => {
-				if (!nodeSet.has(node.id)) {
+				if (!nodeSet.has(node.id) && expandAll || (presentDepartments.length === 0 || presentDepartments.includes(node.department) || node.department === '')) {
 					nodeSet.add(node.id);
 					// console.log('nodeSet updated: Added ' + node.id)
 					// console.log(nodeSet)
@@ -79,7 +84,7 @@ function Graph(props) {
 			})
 			updateNodeSet(nodeSet)
 			expandLinks.forEach(link => {
-				if (!linkSet.has(JSON.stringify(link))) {
+				if (!linkSet.has(JSON.stringify(link)) && expandAll || (nodeSet.has(link.target) && nodeSet.has(link.source))) {
 					linkSet.add(JSON.stringify(link))
 					// console.log('linkSet updated: Added ' + link)
 					// console.log(linkSet)
@@ -90,6 +95,10 @@ function Graph(props) {
 			// console.log('nodes and links to be added:' + JSON.stringify(newNodes))
 			// console.log(newNodes);
 			// console.log(newLinks)
+			if (newNodes.length === 0 || newLinks.length === 0) {
+				window.alert("Node can no longer be expanded");
+				return;
+			}
 			setGraphData(({nodes, links}) => {
 				return {
 					nodes: [...nodes, ...newNodes],

@@ -313,8 +313,10 @@ function App() {
 	}
 
 	const [presentCourses, setPresentCourses] = useState(['CS1010']);
+	const [presentDepartments, setPresentDepartments] = useState(['Computer Science']);
 
 	const [semesterFilter, setSemesterFilter] = useState('');
+	const [expandAll, setExpandAll] = useState(true);
 
 	// pass on variables to props for other components  
 	let props = {
@@ -392,9 +394,14 @@ function App() {
 
 		presentCourses: presentCourses,
 		setPresentCourses: setPresentCourses,
+		presentDepartments: presentDepartments,
+		setPresentDepartments: setPresentDepartments,
 
 		semesterFilter: semesterFilter,
-		setSemesterFilter: setSemesterFilter
+		setSemesterFilter: setSemesterFilter,
+
+		expandAll: expandAll,
+		setExpandAll: setExpandAll
 	}
 
 	//check graphData
