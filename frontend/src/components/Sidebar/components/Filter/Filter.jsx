@@ -6,9 +6,15 @@ import Semesters from './components/Semesters/Semesters';
 import Limit from './components/Limit/Limit';
 
 function Filter(props) {
+	const filterURI = props.filterURI;
+
 	const selectedDepartments = props.selectedDepartments;
 	const selectedCourses = props.selectedCourses;
 	const [toggleLimit, setToggleLimit] = useState(true);
+
+	const setSemesterFilter = props.setSemesterFilter;
+	const presentCourses = props.presentCourses;
+	const setPresentCourses = props.setPresentCourses;
 
 	function handleSubmit() {
 		const semester = document.getElementById('semesters-search').value;
@@ -20,12 +26,11 @@ function Filter(props) {
 			return;
 		}
 
-		if (semester === '') props.setSemesterFilter(() => false);
-		else props.setSemesterFilter(() => true);
+		setSemesterFilter(semester);
 
-		props.presentCourses.length = 0;
-		selectedCourses.forEach(val => props.presentCourses.push(val));
-		props.setPresentCourses(props.presentCourses);
+		presentCourses.length = 0;
+		selectedCourses.forEach(val => presentCourses.push(val));
+		setPresentCourses(presentCourses);
 
 		const filterObject = {
 			departments: selectedDepartments,
@@ -38,7 +43,7 @@ function Filter(props) {
 	}
 
 	async function sendData(data) {
-		await fetch(props.filterURI, {
+		await fetch(filterURI, {
 			method: 'POST',
 			body: data
 		})

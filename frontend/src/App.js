@@ -314,7 +314,7 @@ function App() {
 
 	const [presentCourses, setPresentCourses] = useState(['CS1010']);
 
-	const [semesterFilter, setSemesterFilter] = useState(false);
+	const [semesterFilter, setSemesterFilter] = useState('');
 
 	// pass on variables to props for other components  
 	let props = {
@@ -324,8 +324,8 @@ function App() {
 		expandNodeURI: expandNodeURI,
 
 		graphData: graphData,
-		error: graphError,
-		loading: graphLoading,
+		graphError: graphError,
+		graphLoading: graphLoading,
 		setGraphData: setGraphData,
 		setError: setGraphError,
 		setLoading: setGraphLoading,
