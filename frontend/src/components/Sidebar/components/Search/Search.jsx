@@ -1,12 +1,24 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import './search.css';
 import { HiChevronDown, HiChevronUp } from "react-icons/hi"
 
 function Search(props) {
 
-	const availableChoices = props.listOfCourses;
+	const listOfCourses = props.listOfCourses;
+	let availableChoices = [];
 	const [autoComplete, setAutoComplete] = useState(null);
 	const [toggleSuggestions, setToggleSuggestions] = useState(false);
+
+	const openDesc = props.openDesc;
+	const graphData = props.graphData;
+	const nodeSet = props.nodeSet
+
+	useEffect(() => {
+		availableChoices = listOfCourses.filter(course => {
+			const courseCode = course.courseCode
+			return nodeSet.has(courseCode)
+		})
+	}, [graphData])
 	
 	function displaySuggestions() {
 		setToggleSuggestions(true);
@@ -20,14 +32,14 @@ function Search(props) {
 
 	function handleSearchSubmit(courseName) {
 		// console.log(props.graphData)
-		if (props.graphData === null) {
+		if (graphData === null) {
 			window.alert("The server is currently down, please try again later");
 			return;
 		}
 		// console.log(courseName);
-		const node = props.graphData.nodes.filter(node => node.id === courseName)
+		const node = graphData.nodes.filter(node => node.id === courseName)
 		if (node[0] === undefined) {
-			props.openDesc(false, "Course not found!");
+			openDesc(false, "Course not found!");
 		}
 		else {
 			const courseData = node[0]
@@ -45,7 +57,7 @@ function Search(props) {
     }
 	}
 
-	function handleFilterChoices() {
+	const handleFilterChoices = useCallback(() => {
 		displaySuggestions();
 		let matchedChoices = [];
 		let input = document.getElementById('search-bar').value;
@@ -76,7 +88,7 @@ function Search(props) {
 			</ul>
 		}
 		setAutoComplete(content);
-	}
+	}, [graphData])
 
 	return (
 	<>
