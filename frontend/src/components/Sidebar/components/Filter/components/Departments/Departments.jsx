@@ -98,8 +98,6 @@ function Departments(props) {
 					}
 				</div>
 			}
-			<div id='department-warning' className='department-warning'></div>
-			<br />
 		</div >
 
 	)

@@ -1,0 +1,14 @@
+.expand-toggle-label{
+	padding-left: 2px;
+	padding-right: 10px;
+	font-size: 13px;
+}
+
+.expand-toggle-container {
+	display: flex;
+}
+
+.expand-toggle-switch {
+	padding-left: 3px;
+	padding-right: 3px;
+}

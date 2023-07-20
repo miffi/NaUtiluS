@@ -36,7 +36,7 @@ function Graph(props) {
 	const presentCourses = props.presentCourses;
 	const presentDepartments = props.presentDepartments;
 	const semesterFilter = props.semesterFilter;
-	const expandAll = props.expandAll;
+	const expandAll = !props.expandByDepartment;
 
 	// const [dblclickNode, setDblclickNode] = useState(null);
 
@@ -75,7 +75,7 @@ function Graph(props) {
 				return;
 			}
 			expandNodes.forEach(node => {
-				if (!nodeSet.has(node.id) && expandAll || (presentDepartments.length === 0 || presentDepartments.includes(node.department) || node.department === '')) {
+				if (!nodeSet.has(node.id) && (expandAll || (presentDepartments.length === 0 || presentDepartments.includes(node.department) || node.department === ''))) {
 					nodeSet.add(node.id);
 					// console.log('nodeSet updated: Added ' + node.id)
 					// console.log(nodeSet)
@@ -84,7 +84,7 @@ function Graph(props) {
 			})
 			updateNodeSet(nodeSet)
 			expandLinks.forEach(link => {
-				if (!linkSet.has(JSON.stringify(link)) && expandAll || (nodeSet.has(link.target) && nodeSet.has(link.source))) {
+				if (!linkSet.has(JSON.stringify(link)) && (expandAll || (nodeSet.has(link.target) && nodeSet.has(link.source)))) {
 					linkSet.add(JSON.stringify(link))
 					// console.log('linkSet updated: Added ' + link)
 					// console.log(linkSet)

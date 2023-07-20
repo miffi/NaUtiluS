@@ -316,7 +316,7 @@ function App() {
 	const [presentDepartments, setPresentDepartments] = useState(['Computer Science']);
 
 	const [semesterFilter, setSemesterFilter] = useState('');
-	const [expandAll, setExpandAll] = useState(true);
+	const [expandByDepartment, setExpandByDepartment] = useState(false);
 
 	// pass on variables to props for other components  
 	let props = {
@@ -400,8 +400,8 @@ function App() {
 		semesterFilter: semesterFilter,
 		setSemesterFilter: setSemesterFilter,
 
-		expandAll: expandAll,
-		setExpandAll: setExpandAll
+		expandByDepartment: expandByDepartment,
+		setExpandByDepartment: setExpandByDepartment
 	}
 
 	//check graphData

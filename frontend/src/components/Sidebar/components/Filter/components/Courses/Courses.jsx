@@ -104,8 +104,6 @@ function Courses(props) {
 					}
 				</div>
 			}
-			<div id='course-warning' className='course-warning'></div>
-			<br />
 		</div>
 
 	)
