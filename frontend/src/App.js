@@ -4,6 +4,10 @@ import oldData from './exampledata.json';
 
 import Sidebar from './components/Sidebar/Sidebar'
 import Graph from './components/Graph/Graph'
+import Alerts from './components/Alerts/Alerts'
+
+import { ThemeProvider, createTheme } from '@mui/material/styles';
+import { HiOutlineExclamationCircle } from 'react-icons/hi'
 
 function App() {
 	
@@ -15,8 +19,14 @@ function App() {
 	const expandNodeURI = process.env.REACT_APP_BACKEND_HOSTNAME + "/v1/expandNode.json"
 
 	//states for filter arrays
-	const [selectedDepartments, setSelectedDepartments] = useState(['Computer Science'])
 	const [selectedCourses, setSelectedCourses] = useState(['CS1010'])
+	const [selectedDepartments, setSelectedDepartments] = useState(['Computer Science'])
+
+	//states for fitler condition after every apply
+	const [presentCourses, setPresentCourses] = useState(['CS1010']);
+	const [presentDepartments, setPresentDepartments] = useState(['Computer Science']);
+	const [semesterFilter, setSemesterFilter] = useState('');
+	const [expandByDepartment, setExpandByDepartment] = useState(false);
 
 	// variables to handle toggle of Filter and Description sidebars
 	const [toggleFilter, setToggleFilter] = useState(false)
@@ -312,9 +322,17 @@ function App() {
 		setHighlightLinks(highlightLinks);
 	}
 
-	const [presentCourses, setPresentCourses] = useState(['CS1010']);
-
-	const [semesterFilter, setSemesterFilter] = useState('');
+	const delay = ms => new Promise(res => setTimeout(res, ms));
+	async function showAlert(elemId) {
+		const elem = document.getElementById(elemId);
+		elem.style.display = 'flex';
+		await delay(10);
+		elem.style.opacity = '100%';
+		await delay(2700);
+		elem.style.opacity = 0;
+		await delay(200);
+		elem.style.display = 'none';
+	}
 
 	// pass on variables to props for other components  
 	let props = {
@@ -353,10 +371,19 @@ function App() {
 		setToggleSearch: setToggleSearch,
 		setToggleHelp: setToggleHelp,
 		
-		selectedDepartments: selectedDepartments,
 		selectedCourses: selectedCourses,
-		setSelectedDepartments: setSelectedDepartments,
+		selectedDepartments: selectedDepartments,
+		presentCourses: presentCourses,
+		presentDepartments: presentDepartments,
 		setSelectedCourses: setSelectedCourses,
+		setSelectedDepartments: setSelectedDepartments,
+		setPresentCourses: setPresentCourses,
+		setPresentDepartments: setPresentDepartments,
+
+		semesterFilter: semesterFilter,
+		expandByDepartment: expandByDepartment,
+		setSemesterFilter: setSemesterFilter,
+		setExpandByDepartment: setExpandByDepartment,
 		
 		closeFilter: closeFilter,
 		openFilter: openFilter,
@@ -390,12 +417,18 @@ function App() {
 		highlightSurroundings: highlightSurroundings,
 		updateHighlight: updateHighlight,
 
-		presentCourses: presentCourses,
-		setPresentCourses: setPresentCourses,
-
-		semesterFilter: semesterFilter,
-		setSemesterFilter: setSemesterFilter
+		delay: delay,
+		showAlert: showAlert
 	}
+
+	const theme = createTheme({
+		typography: {
+			fontFamily: [
+				'Manrope',
+				'Arial'
+			].join(','),
+		}
+	});
 
 	//check graphData
 	// useEffect(() => console.log(graphData), [graphData])
@@ -407,11 +440,23 @@ function App() {
 			</div>
 		)
 	}
+	if (graphError || coursesError || departmentsError) {
+		return (
+			<div className='loading-window'>
+				<HiOutlineExclamationCircle className="error-icon" />
+				<div className='loading-text'>Server is down</div>
+			</div>
+		)
+	}
 	return (
-		<div className='App'>
-			<Sidebar {...props} />
-			<Graph {...props} />
-		</div>
+		<ThemeProvider theme={theme}>
+			<div className='App'>
+				<Sidebar {...props} />
+				<Graph {...props} />
+				<Alerts />
+			</div>
+		</ThemeProvider>
+		
 	)
 }
 

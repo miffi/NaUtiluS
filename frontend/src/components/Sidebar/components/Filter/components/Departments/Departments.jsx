@@ -3,7 +3,7 @@ import { HiChevronUp, HiChevronDown, HiX } from "react-icons/hi"
 import './departments.css'
 
 function Departments(props) {
-	const delay = ms => new Promise(res => setTimeout(res, ms));
+	const delay = props.delay
 
 	const listOfDepartments = props.listOfDepartments;
 	const [autoComplete, setAutoComplete] = useState(null);
@@ -98,8 +98,6 @@ function Departments(props) {
 					}
 				</div>
 			}
-			<div id='department-warning' className='department-warning'></div>
-			<br />
 		</div >
 
 	)

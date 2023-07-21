@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide } from 'd3-force-3d'
+import { forceCollide } from 'd3-force-3d';
 
 import './graph.css';
 
 
 function Graph(props) {
 	const expandNodeURI = props.expandNodeURI;
+	const showAlert = props.showAlert
 
 	const graphData = props.graphData;
 	const loading = props.graphLoading;
@@ -24,8 +25,8 @@ function Graph(props) {
 
 	const hoverNode = props.hoverNode;
 	const clickNode = props.clickNode;
-	const	setHoverNode = props.setHoverNode;
-	const	setClickNode = props.setClickNode;
+	const setHoverNode = props.setHoverNode;
+	const setClickNode = props.setClickNode;
 
 	const highlightLinks = props.highlightLinks;
 	const highlightNodes = props.highlightNodes;
@@ -34,7 +35,9 @@ function Graph(props) {
 	const closeDesc = props.closeDesc;
 	const handleSingleClick = props.handleSingleClick;
 	const presentCourses = props.presentCourses;
+	const presentDepartments = props.presentDepartments;
 	const semesterFilter = props.semesterFilter;
+	const expandAll = !props.expandByDepartment;
 
 	// const [dblclickNode, setDblclickNode] = useState(null);
 
@@ -68,9 +71,12 @@ function Graph(props) {
 			const expandLinks = data.links;
 			const newNodes = [];
 			const newLinks = [];
-			if (expandNodes === null || expandLinks === null) return; //Add an alert
+			if (expandNodes === null || expandLinks === null) {
+				showAlert('alert-max-expand')
+				return;
+			}
 			expandNodes.forEach(node => {
-				if (!nodeSet.has(node.id)) {
+				if (!nodeSet.has(node.id) && (expandAll || (presentDepartments.length === 0 || presentDepartments.includes(node.department) || node.department === ''))) {
 					nodeSet.add(node.id);
 					// console.log('nodeSet updated: Added ' + node.id)
 					// console.log(nodeSet)
@@ -79,7 +85,7 @@ function Graph(props) {
 			})
 			updateNodeSet(nodeSet)
 			expandLinks.forEach(link => {
-				if (!linkSet.has(JSON.stringify(link))) {
+				if (!linkSet.has(JSON.stringify(link)) && (expandAll || (nodeSet.has(link.target) && nodeSet.has(link.source)))) {
 					linkSet.add(JSON.stringify(link))
 					// console.log('linkSet updated: Added ' + link)
 					// console.log(linkSet)
@@ -90,6 +96,10 @@ function Graph(props) {
 			// console.log('nodes and links to be added:' + JSON.stringify(newNodes))
 			// console.log(newNodes);
 			// console.log(newLinks)
+			if (newNodes.length === 0 && newLinks.length === 0) {
+				showAlert('alert-max-expand')
+				return;
+			}
 			setGraphData(({nodes, links}) => {
 				return {
 					nodes: [...nodes, ...newNodes],
@@ -115,8 +125,7 @@ function Graph(props) {
 		
 		const object = {
 			name: name,
-			neighbors: neighbors,
-			semester: semesterFilter
+			neighbors: neighbors
 		}
 		
 		updateRightClick(object)

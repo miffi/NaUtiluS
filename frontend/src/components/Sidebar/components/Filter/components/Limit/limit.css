@@ -1,17 +1,20 @@
 .limit-label{
 	padding-left: 2px;
 	padding-right: 10px;
+	font-size: 13px;
 }
 
 .limit-container {
+	display: flex;
 	align-items: center;
 }
 
 .limit-input {
-	width: 80px;
+	font-size: 13px;
+	width: 75px;
 	height: 25px;
 	margin: none;
-	padding-left: 10px;
+	padding-left: 6px;
 	border-radius: 3px;
 	border: none;
 	outline: none;

@@ -52,7 +52,8 @@ function Help() {
           <li>Zoom with the scroll wheel</li>
 					<li>Left click and drag to drag nodes around</li>
 					<li>Left click nodes to show a description and highlight direct requirements</li>
-					<li>Right click nodes to expand all of its direct relationships</li>
+					<li>Right click course nodes to expand all direct relationships from itself</li>
+					<li>Right click cluster nodes to expand all direct relationships from and to itself</li>
 				</ul>
 				Hovering and left-clicking on a node will highlight surrounding nodes:
 				<div style={{display: 'flex', alignItems: 'center'}}>

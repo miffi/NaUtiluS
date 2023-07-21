@@ -3,7 +3,7 @@ import { HiChevronUp, HiChevronDown, HiX } from "react-icons/hi"
 import './courses.css'
 
 function Courses(props) {
-	const delay = ms => new Promise(res => setTimeout(res, ms));
+	const delay = props.delay;
 
 	const listOfCourses = props.listOfCourses
 	const [autoComplete, setAutoComplete] = useState(null);
@@ -104,8 +104,6 @@ function Courses(props) {
 					}
 				</div>
 			}
-			<div id='course-warning' className='course-warning'></div>
-			<br />
 		</div>
 
 	)

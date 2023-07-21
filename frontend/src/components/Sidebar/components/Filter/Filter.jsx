@@ -4,31 +4,41 @@ import Departments from './components/Departments/Departments';
 import Courses from './components/Courses/Courses';
 import Semesters from './components/Semesters/Semesters';
 import Limit from './components/Limit/Limit';
+import ExpandToggle from './components/ExpandToggle/ExpandToggle';
 
 function Filter(props) {
 	const filterURI = props.filterURI;
 	const graphRef = props.graphRef;
+	const showAlert = props.showAlert;
 
 	const setGraphData = props.setGraphData;
+	const closeDesc = props.closeDesc;
 
 	const selectedDepartments = props.selectedDepartments;
 	const selectedCourses = props.selectedCourses;
-	const [toggleLimit, setToggleLimit] = useState(true);
 
 	const setSemesterFilter = props.setSemesterFilter;
 	const presentCourses = props.presentCourses;
+	const presentDepartments = props.presentDepartments;
 	const setPresentCourses = props.setPresentCourses;
+	const setPresentDepartments = props.setPresentDepartments;
+
+	const setExpandByDepartment = props.setExpandByDepartment;
+	const [toggleLimit, setToggleLimit] = useState(true);
 
 	const updateNodeSet = props.updateNodeSet;
 	const updateLinkSet = props.updateLinkSet;
 
 	function handleSubmit() {
+		closeDesc();
+		
 		const semester = document.getElementById('semesters-search').value;
+		const toggle = document.getElementById('expand-toggle-switch').checked;
 		const limitVal = selectedCourses.length > 0 ? document.getElementById('limit-input').value : 0;
 		const limit = limitVal ? parseInt(limitVal) : 0;
 
 		if (selectedCourses.length === 0 && selectedDepartments.length === 0) {
-			window.alert('Please specify a filter!');
+			showAlert('alert-empty-filter');
 			return;
 		}
 
@@ -37,6 +47,13 @@ function Filter(props) {
 		presentCourses.length = 0;
 		selectedCourses.forEach(val => presentCourses.push(val));
 		setPresentCourses(presentCourses);
+
+		presentDepartments.length = 0;
+		selectedDepartments.forEach(val => presentDepartments.push(val));
+		setPresentDepartments(presentDepartments);
+
+		setExpandByDepartment(toggle);
+		// console.log(toggle)
 
 		const filterObject = {
 			departments: selectedDepartments,
@@ -62,14 +79,14 @@ function Filter(props) {
 		})
 		.then(data => {
 			// console.log(data);
-			if (!data.nodes) window.alert('No courses fit this description!')
+			if (!data.nodes) showAlert('alert-no-match')
 			else if (data.nodes && !data.links) {
-				console.log(data);
+				// console.log(data);
 				data.links = [];
 				updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
-					console.log(prevNodeSet);
+					// console.log(prevNodeSet);
 					return prevNodeSet;
 				})
 				updateLinkSet(prevLinkSet => {
@@ -86,7 +103,7 @@ function Filter(props) {
 				updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
-					console.log(prevNodeSet);
+					// console.log(prevNodeSet);
 					return prevNodeSet;
 				})
 				updateLinkSet(prevLinkSet => {
@@ -106,13 +123,14 @@ function Filter(props) {
 	const newProps = {
 		...props, 
 		toggleLimit: toggleLimit,
-		setToggleLimit: setToggleLimit	
+		setToggleLimit: setToggleLimit
 	}
 
 	return (
 		<div className="menu-filter" id="filter">
 			<h1>Filter</h1>
 			<Departments {...newProps} />
+			<ExpandToggle {...newProps} />
 			<Courses {...newProps} />
 			{toggleLimit && <Limit />}
 			<Semesters {...newProps} />
