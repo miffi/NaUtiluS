@@ -38,6 +38,16 @@ body {
 	transform: translate(-50%, 20px);
 }
 
+.error-icon {
+	position: relative;
+  display: inline-block;
+  width: 80px;
+  height: 80px;
+	left: 50%;
+	top: 40%;
+	color: #ffffff;
+	transform: translate(-50%, -50%);
+}
 .lds-default {
 	position: relative;
   display: inline-block;

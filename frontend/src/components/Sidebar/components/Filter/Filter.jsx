@@ -9,6 +9,7 @@ import ExpandToggle from './components/ExpandToggle/ExpandToggle';
 function Filter(props) {
 	const filterURI = props.filterURI;
 	const graphRef = props.graphRef;
+	const showAlert = props.showAlert;
 
 	const setGraphData = props.setGraphData;
 	const closeDesc = props.closeDesc;
@@ -37,7 +38,7 @@ function Filter(props) {
 		const limit = limitVal ? parseInt(limitVal) : 0;
 
 		if (selectedCourses.length === 0 && selectedDepartments.length === 0) {
-			window.alert('Please specify a filter!');
+			showAlert('alert-empty-filter');
 			return;
 		}
 
@@ -52,7 +53,7 @@ function Filter(props) {
 		setPresentDepartments(presentDepartments);
 
 		setExpandByDepartment(toggle);
-		console.log(toggle)
+		// console.log(toggle)
 
 		const filterObject = {
 			departments: selectedDepartments,
@@ -78,14 +79,14 @@ function Filter(props) {
 		})
 		.then(data => {
 			// console.log(data);
-			if (!data.nodes) window.alert('No courses fit this description!')
+			if (!data.nodes) showAlert('alert-no-match')
 			else if (data.nodes && !data.links) {
-				console.log(data);
+				// console.log(data);
 				data.links = [];
 				updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
-					console.log(prevNodeSet);
+					// console.log(prevNodeSet);
 					return prevNodeSet;
 				})
 				updateLinkSet(prevLinkSet => {
@@ -102,7 +103,7 @@ function Filter(props) {
 				updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
-					console.log(prevNodeSet);
+					// console.log(prevNodeSet);
 					return prevNodeSet;
 				})
 				updateLinkSet(prevLinkSet => {

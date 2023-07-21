@@ -33,7 +33,7 @@ function Search(props) {
 	function handleSearchSubmit(courseName) {
 		// console.log(props.graphData)
 		if (graphData === null) {
-			window.alert("The server is currently down, please try again later");
+			props.showAlert('alert-server-down')
 			return;
 		}
 		// console.log(courseName);

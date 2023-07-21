@@ -1,12 +1,13 @@
 import React, { useCallback, useEffect, useState } from "react";
 import ForceGraph2D from 'react-force-graph-2d';
-import { forceCollide } from 'd3-force-3d'
+import { forceCollide } from 'd3-force-3d';
 
 import './graph.css';
 
 
 function Graph(props) {
 	const expandNodeURI = props.expandNodeURI;
+	const showAlert = props.showAlert
 
 	const graphData = props.graphData;
 	const loading = props.graphLoading;
@@ -71,7 +72,7 @@ function Graph(props) {
 			const newNodes = [];
 			const newLinks = [];
 			if (expandNodes === null || expandLinks === null) {
-				window.alert("Node can no longer be expanded");
+				showAlert('alert-max-expand')
 				return;
 			}
 			expandNodes.forEach(node => {
@@ -95,8 +96,8 @@ function Graph(props) {
 			// console.log('nodes and links to be added:' + JSON.stringify(newNodes))
 			// console.log(newNodes);
 			// console.log(newLinks)
-			if (newNodes.length === 0 || newLinks.length === 0) {
-				window.alert("Node can no longer be expanded");
+			if (newNodes.length === 0 && newLinks.length === 0) {
+				showAlert('alert-max-expand')
 				return;
 			}
 			setGraphData(({nodes, links}) => {
@@ -124,8 +125,7 @@ function Graph(props) {
 		
 		const object = {
 			name: name,
-			neighbors: neighbors,
-			semester: semesterFilter
+			neighbors: neighbors
 		}
 		
 		updateRightClick(object)
