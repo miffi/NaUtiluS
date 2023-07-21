@@ -326,12 +326,14 @@ function App() {
 	async function showAlert(elemId) {
 		const elem = document.getElementById(elemId);
 		elem.style.display = 'flex';
+		elem.style.top = '20px';
 		await delay(10);
 		elem.style.opacity = '100%';
 		await delay(2700);
 		elem.style.opacity = 0;
 		await delay(200);
 		elem.style.display = 'none';
+		elem.style.top = '-200px';
 	}
 
 	// pass on variables to props for other components  
