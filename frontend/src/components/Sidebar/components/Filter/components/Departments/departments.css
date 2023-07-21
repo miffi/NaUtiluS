@@ -5,11 +5,12 @@
 .departments-container {
 	width: 250px;
 	padding: none;
-	margin: 7px 0px 2px 3px;
+	margin: 7px 0px 0px 3px;
 	padding: 0;
 	border-radius: 3px;
 	display: flex;
 	align-items: center;
+
 }
 
 .departments-search {
@@ -50,7 +51,7 @@
 .departments-suggestions {
 	width: 250px;
 	max-height: 300px;
-	margin: 0px 0px 10px 3px;
+	margin: 2px 0px 10px 3px;
 	border-radius: 3px;
 	background-color: #f8f7f7;
 	color: #555;
@@ -83,7 +84,7 @@
 
 .departments-selected {
 	background-color: rgb(220, 220, 220);
-	margin: 0px 0px 10px 3px;
+	margin: 2px 0px 0px 3px;
 	padding: 5px 10px;
 	width: 230px;
 	border-radius: 3px;

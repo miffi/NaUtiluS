@@ -5,6 +5,7 @@
 }
 
 .expand-toggle-container {
+	padding-top: 10px;
 	display: flex;
 }
 
