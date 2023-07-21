@@ -23,6 +23,7 @@ function Semesters() {
 
 	return (
 		<>
+		<br />
 		<label className='semesters-label'>Semester</label><br />
 		<div id='semesters-container' className='semesters-container'>
 			<input id='semesters-search' className='semesters-search' type="text" placeholder='All'
