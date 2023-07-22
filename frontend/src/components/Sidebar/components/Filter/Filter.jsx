@@ -53,7 +53,6 @@ function Filter(props) {
 		setPresentDepartments(presentDepartments);
 
 		setExpandByDepartment(toggle);
-		// console.log(toggle)
 
 		const filterObject = {
 			departments: selectedDepartments,
@@ -71,49 +70,40 @@ function Filter(props) {
 			body: data
 		})
 		.then(response => {
-			// console.log(response.status);
 			if (!response.ok) {
 				throw new Error("HTTP status " + response.status);
 			}
 			return response.json();
 		})
 		.then(data => {
-			// console.log(data);
 			if (!data.nodes) showAlert('alert-no-match')
 			else if (data.nodes && !data.links) {
-				// console.log(data);
 				data.links = [];
 				updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
-					// console.log(prevNodeSet);
 					return prevNodeSet;
 				})
 				updateLinkSet(prevLinkSet => {
 					prevLinkSet.clear();
 					data.links.forEach(link => prevLinkSet.add(JSON.stringify(link)));
-					// console.log(prevLinkSet);
 					return prevLinkSet;
 				})
 				setGraphData(() => data)
-				//console.log(data)
 				graphRef.current.zoom(2);
 				graphRef.current.centerAt(-20, 0, 200);
 			} else {
 				updateNodeSet(prevNodeSet => {
 					prevNodeSet.clear();
 					data.nodes.forEach(node => prevNodeSet.add(node.id));
-					// console.log(prevNodeSet);
 					return prevNodeSet;
 				})
 				updateLinkSet(prevLinkSet => {
 					prevLinkSet.clear();
 					data.links.forEach(link => prevLinkSet.add(JSON.stringify(link)));
-					// console.log(prevLinkSet);
 					return prevLinkSet;
 				})
 				setGraphData(() => data)
-				//console.log(data)
 				graphRef.current.zoom(4.5)
 				graphRef.current.centerAt(-20, 0, 200);
 			}

@@ -39,8 +39,6 @@ function Graph(props) {
 	const semesterFilter = props.semesterFilter;
 	const expandAll = !props.expandByDepartment;
 
-	// const [dblclickNode, setDblclickNode] = useState(null);
-
 	// handle window resize
 	window.addEventListener('resize', () => {
 		setDisplayWidth(window.innerWidth);
@@ -78,8 +76,6 @@ function Graph(props) {
 			expandNodes.forEach(node => {
 				if (!nodeSet.has(node.id) && (expandAll || (presentDepartments.length === 0 || presentDepartments.includes(node.department) || node.department === ''))) {
 					nodeSet.add(node.id);
-					// console.log('nodeSet updated: Added ' + node.id)
-					// console.log(nodeSet)
 					newNodes.push(node);
 				}
 			})
@@ -87,15 +83,10 @@ function Graph(props) {
 			expandLinks.forEach(link => {
 				if (!linkSet.has(JSON.stringify(link)) && (expandAll || (nodeSet.has(link.target) && nodeSet.has(link.source)))) {
 					linkSet.add(JSON.stringify(link))
-					// console.log('linkSet updated: Added ' + link)
-					// console.log(linkSet)
 					newLinks.push(link)
 				}
 			})
 			updateLinkSet(linkSet);
-			// console.log('nodes and links to be added:' + JSON.stringify(newNodes))
-			// console.log(newNodes);
-			// console.log(newLinks)
 			if (newNodes.length === 0 && newLinks.length === 0) {
 				showAlert('alert-max-expand')
 				return;
@@ -106,9 +97,6 @@ function Graph(props) {
 					links: [...links, ...newLinks]
 				};
 			});
-			// console.log('sets after')
-			// console.log(nodeSet);
-			// console.log(linkSet)
 		})
 	}
 
@@ -215,11 +203,9 @@ function Graph(props) {
 			}
 		}
 		onNodeClick={node => {
-			// console.log('Single click');
 			handleSingleClick(node);
 		}}
 		onNodeRightClick={ node =>{
-			// console.log('Right click')
 			handleRightClick(node)
 		}}
 		onNodeHover={node => {
