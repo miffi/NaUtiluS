@@ -1,8 +1,9 @@
 import React from 'react';
 import './description.css';
 
-function CourseInfo() {
+function Description() {
 	return (
+		<div className="menu-description" id="description">
 			<div className='course-info'>
 				<h1 id='description_header' className='description-header'>Course Information</h1>
 				<div id='description_placeholder' className='description-placeholder'></div>
@@ -20,13 +21,6 @@ function CourseInfo() {
 					</div><br />
 				</div>
 			</div>
-	);
-}
-
-function Description() {
-	return (
-		<div className="menu-description" id="description">
-			<CourseInfo />
 		</div>
 	);
 }
