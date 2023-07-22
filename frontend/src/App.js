@@ -85,17 +85,6 @@ function App() {
 			const title = content.courseCode + " " + content.title
 			const description = content.description;
 			const semesters = content.semesters.join(', ')
-			// const semesters = content.semesterData
-			// 	.map(sem => sem.semester === 1 || sem.semester === 2
-			// 			? "Semester " + sem.semester
-			// 			: sem.semester === 3
-			// 			? "Special Semester 1"
-			// 			: sem.semester === 4
-			// 			? "Special Semester 2"
-			// 			: "Unspecified")
-			// 	.reduce(
-			// 		(accumulator, currentValue) => accumulator + ", " + currentValue
-			// 	)
 			const prereqs = content.prerequisite;
 
 			document.getElementById('description_header').innerHTML = title;
@@ -173,28 +162,23 @@ function App() {
 			body: JSON.stringify(initialFilter)
 		})
 		.then(response => {
-			// console.log("filter data received, status: " + response.status);
 			if (!response.ok) {
 				throw new Error("HTTP status " + response.status);
 			}
 			return response.json();
 		})
 		.then(data => {
-			// console.log(data);
 			updateNodeSet(prevNodeSet => {
 				prevNodeSet.clear();
 				data.nodes.forEach(node => prevNodeSet.add(node.id));
-				// console.log(prevNodeSet);
 				return prevNodeSet;
 			})
 			updateLinkSet(prevLinkSet => {
 				prevLinkSet.clear();
 				data.links.forEach(link => prevLinkSet.add(JSON.stringify(link)));
-				// console.log(prevLinkSet);
 				return prevLinkSet;
 			})
 			setGraphData(data);
-			// console.log(semesterFilter)
 		})
 		.catch(error => {
 			console.log('Error: failed to fetch graph data: ' + error);
@@ -211,14 +195,12 @@ function App() {
 		fetch(courseSummaryURI)
 			.then(response => {
 				if (response.ok) {
-					// console.log("course data received");
 					return response.json();
 				}
 				throw response;
 			})
 			.then(data => {
 				setCourses(data);
-				// // console.log(data);
 			})
 			.catch(error => {
 				console.error("Error fetching courses list data: ", error);
@@ -237,14 +219,12 @@ function App() {
 		fetch(departmentsURI)
 			.then(response => {
 				if (response.ok) {
-					// console.log("departments data received");
 					return response.json();
 				}
 				throw response;
 			})
 			.then(data => {
 				setDepartments(data);
-				// // console.log(data);
 			})
 			.catch(error => {
 				console.error("Error fetching departments list data: ", error);
@@ -266,7 +246,6 @@ function App() {
 				throw response;
 			})
 			.then(data => {
-				// // console.log(data);
 				openDesc(true, data)
 			})
 			.catch(error => {
@@ -433,7 +412,6 @@ function App() {
 	});
 
 	//check graphData
-	// useEffect(() => console.log(graphData), [graphData])
 	if (graphLoading || coursesLoading || departmentsLoading) {
 		return (
 			<div className='loading-window'>

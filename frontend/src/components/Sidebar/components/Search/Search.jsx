@@ -31,12 +31,10 @@ function Search(props) {
 	}
 
 	function handleSearchSubmit(courseName) {
-		// console.log(props.graphData)
 		if (graphData === null) {
 			props.showAlert('alert-server-down')
 			return;
 		}
-		// console.log(courseName);
 		const node = graphData.nodes.filter(node => node.id === courseName)
 		if (node[0] === undefined) {
 			openDesc(false, "Course not found!");
