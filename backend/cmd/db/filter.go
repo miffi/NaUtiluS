@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/miffi/nautilus/backend/cmd/api/types"
+	"github.com/miffi/nautilus/backend/cmd/types"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 )
 
@@ -120,7 +120,6 @@ MATCH (cluster:Cluster)-[:REQUIRES]-(:Course)`)
 		sb.WriteString(`RETURN cluster.name AS name, "" AS department, true AS cluster, false AS indirect`)
 	}
 
-	fmt.Println(sb.String())
 	return sb.String()
 }
 

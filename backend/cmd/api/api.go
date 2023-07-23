@@ -25,40 +25,48 @@ type config struct {
 
 // A store of the application wide state of the web server.
 type application struct {
-	config  config
-	logger  zerolog.Logger
-	dbquery db.DbQuery
+	CORSAddress string
+	logger      zerolog.Logger
+	dbquery     db.DbQuery
 }
 
 func main() {
 	logger := zerolog.New(os.Stdout)
+	fatalError := func(err error) {
+		logger.Fatal().Err(err).Msg("")
+	}
 
 	config, err := getConfigs()
 	if err != nil {
-		logger.Fatal().Err(err).Msg("")
+		fatalError(err)
 	}
 
 	dbURI := "neo4j+s://a7d269fe.databases.neo4j.io"
 	dbquery, err := db.NewDbQuery(dbURI, "neo4j", config.neo4jPassword, logger)
 	if err != nil {
-		logger.Fatal().Err(err).Msg("")
+		fatalError(err)
 	}
 
 	defer func() {
 		err = dbquery.Close(context.TODO())
 		if err != nil {
-			logger.Fatal().Err(err).Msg("")
+			fatalError(err)
 		}
 	}()
 
+	CORSAddress := ""
+	if config.localCORS {
+		CORSAddress = "https://nautilus-delta.vercel.app"
+	} else {
+		CORSAddress = fmt.Sprintf("http://localhost:%d", config.localCORSPort)
+	}
+
 	app := &application{
-		config,
+		CORSAddress,
 		logger,
 		dbquery,
 	}
-
 	router := app.routes()
-
 	server := &http.Server{
 		Addr:         fmt.Sprintf(":%d", config.port),
 		Handler:      router,
@@ -70,7 +78,7 @@ func main() {
 	logger.Info().Msgf("starting %s server on %s", APP_NAME, server.Addr)
 	err = server.ListenAndServe()
 	if err != nil {
-		logger.Fatal().Err(err).Msg("")
+		fatalError(err)
 	}
 }
 

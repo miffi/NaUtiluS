@@ -3,24 +3,24 @@ package db
 import (
 	"context"
 
-	"github.com/miffi/nautilus/backend/cmd/api/types"
+	"github.com/miffi/nautilus/backend/cmd/types"
 	"github.com/neo4j/neo4j-go-driver/v5/neo4j"
 	"github.com/rs/zerolog"
 )
 
 type DbQuery interface {
-	QueryFullGraph(ctx context.Context) (types.Graph, error)
+	FullGraph(ctx context.Context) (types.Graph, error)
 	Close(ctx context.Context) error
 	MakeOr(ctx context.Context) (string, error)
-	CourseSummaries(ctx context.Context) ([]types.Summary, error)
-	CourseDetail(ctx context.Context, code string) (types.Detail, error)
+	CourseSummaries(ctx context.Context) ([]types.CourseSummary, error)
+	CourseDetail(ctx context.Context, code string) (types.Course, error)
 	Departments(ctx context.Context) ([]string, error)
 	Filter(ctx context.Context, options types.FilterOptions) (types.Graph, error)
 	ExpandNode(ctx context.Context, neighbors types.NodeNeighbors) (types.Graph, error)
 }
 
 type DbModify interface {
-	AddCourse(ctx context.Context, details types.CourseDetails) error
+	AddCourse(ctx context.Context, details types.Course) error
 	AddCluster(ctx context.Context, howMany int, courseNames []string) (string, error)
 	AddRequires(ctx context.Context, source, target, grade string) error
 	Close(ctx context.Context) error
@@ -119,7 +119,7 @@ func getNodesTxFunc(ctx context.Context) neo4j.ManagedTransactionWorkT[[]types.N
 	}
 }
 
-func (db *database) QueryFullGraph(ctx context.Context) (types.Graph, error) {
+func (db *database) FullGraph(ctx context.Context) (types.Graph, error) {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
@@ -143,13 +143,8 @@ func (db *database) QueryFullGraph(ctx context.Context) (types.Graph, error) {
 	return graph, nil
 }
 
-func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.ManagedTransactionWork {
+func addCourseTxFunc(ctx context.Context, course types.Course) neo4j.ManagedTransactionWork {
 	return func(tx neo4j.ManagedTransaction) (any, error) {
-		var semesters []string
-		for _, data := range details.SemesterData {
-			semesters = append(semesters, parseSemester(data.Number))
-		}
-
 		const courseAddQuery = `
 			MERGE (course:Course:Main {name: $name})
 			SET course.title = $title,
@@ -165,15 +160,15 @@ func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.Man
 		`
 		result, err := tx.Run(ctx, courseAddQuery,
 			map[string]any{
-				"name":         details.CourseCode,
-				"faculty":      details.Faculty,
-				"department":   details.Department,
-				"title":        details.Title,
-				"description":  details.Description,
-				"preclusion":   details.Preclusion,
-				"prerequisite": details.Prerequisite,
-				"credit":       details.CourseCredit,
-				"semester":     semesters,
+				"name":         course.Code,
+				"faculty":      course.Faculty,
+				"department":   course.Department,
+				"title":        course.Title,
+				"description":  course.Description,
+				"preclusion":   course.Preclusion,
+				"prerequisite": course.Prerequisite,
+				"credit":       course.Credit,
+				"semester":     course.Semesters,
 			})
 		if err != nil {
 			return nil, err
@@ -182,25 +177,11 @@ func addCourseTxFunc(ctx context.Context, details types.CourseDetails) neo4j.Man
 	}
 }
 
-func parseSemester(num int) string {
-	switch num {
-	case 2:
-		return "Semester 2"
-	case 3:
-		return "Special Semester 1"
-	case 4:
-		return "Special Semester 2"
-	// no obvious way to handle other numbers
-	default:
-		return "Semester 1"
-	}
-}
-
-func (db *database) AddCourse(ctx context.Context, details types.CourseDetails) error {
+func (db *database) AddCourse(ctx context.Context, course types.Course) error {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{AccessMode: neo4j.AccessModeWrite})
 	defer session.Close(ctx)
 
-	_, err := session.ExecuteWrite(ctx, addCourseTxFunc(ctx, details))
+	_, err := session.ExecuteWrite(ctx, addCourseTxFunc(ctx, course))
 	return err
 }
 
@@ -241,7 +222,7 @@ func addClusterTxFunc(ctx context.Context, howMany int, nodeNames []string) neo4
 		WITH c
 		UNWIND $names as name
 		MATCH (n:Main { name: name })
-		CREATE (c)-[:REQUIRES]->(n)
+		MERGE (c)-[:REQUIRES]->(n)
 		RETURN c.name, count(n)
 	`
 	return func(tx neo4j.ManagedTransaction) (string, error) {
@@ -352,11 +333,11 @@ func (db *database) MakeOr(ctx context.Context) (string, error) {
 	})
 }
 
-func (db *database) CourseSummaries(ctx context.Context) ([]types.Summary, error) {
+func (db *database) CourseSummaries(ctx context.Context) ([]types.CourseSummary, error) {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
-	return neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) ([]types.Summary, error) {
+	return neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) ([]types.CourseSummary, error) {
 		const query = `
 			MATCH (n:Course)
 			RETURN n.name as code, n.title as title
@@ -366,10 +347,10 @@ func (db *database) CourseSummaries(ctx context.Context) ([]types.Summary, error
 			return nil, err
 		}
 
-		var summaries []types.Summary
+		var summaries []types.CourseSummary
 		for result.Next(ctx) {
 			value := result.Record().AsMap()
-			summaries = append(summaries, types.Summary{
+			summaries = append(summaries, types.CourseSummary{
 				Code:  value["code"].(string),
 				Title: value["title"].(string),
 			})
@@ -383,13 +364,13 @@ func (db *database) CourseSummaries(ctx context.Context) ([]types.Summary, error
 	})
 }
 
-func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail, error) {
+func (db *database) CourseDetail(ctx context.Context, code string) (types.Course, error) {
 	session := db.driver.NewSession(ctx, neo4j.SessionConfig{DatabaseName: "neo4j"})
 	defer session.Close(ctx)
 
 	db.logger.Debug().Str("Code", code).Str("Function", "CourseDetail").Msg("")
 
-	detail, err := neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) (types.Detail, error) {
+	detail, err := neo4j.ExecuteWrite(ctx, session, func(tx neo4j.ManagedTransaction) (types.Course, error) {
 		const query = `
 			MATCH (n:Course {name: $name})-[:IN_DEPARTMENT]->(department:Department)
 			RETURN n, department.name as department
@@ -398,12 +379,12 @@ func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail
 			"name": code,
 		})
 		if err != nil {
-			return types.Detail{}, err
+			return types.Course{}, err
 		}
 
 		value, err := result.Single(ctx)
 		if err != nil {
-			return types.Detail{}, err
+			return types.Course{}, err
 		}
 
 		node := value.Values[0].(neo4j.Node)
@@ -416,7 +397,7 @@ func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail
 			semesters = append(semesters, semester.(string))
 		}
 
-		return types.Detail{
+		return types.Course{
 			Preclusion:   props["preclusion"].(string),
 			Prerequisite: props["prerequisite"].(string),
 			Description:  props["description"].(string),
@@ -429,7 +410,7 @@ func (db *database) CourseDetail(ctx context.Context, code string) (types.Detail
 		}, nil
 	})
 	if err != nil {
-		return types.Detail{}, err
+		return types.Course{}, err
 	}
 
 	return detail, nil
